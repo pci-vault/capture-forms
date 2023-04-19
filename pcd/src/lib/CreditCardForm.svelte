@@ -1,0 +1,423 @@
+<!--suppress CssUnknownTarget -->
+<script>
+    /*
+    Ported from https://svelte.dev/repl/153bbcac104f42569bcf82a1fb4ad94e?version=3.12.1
+    */
+
+    import {onMount, tick} from 'svelte';
+    import axios from "axios";
+    import luhn from "luhn-js"
+    import CreditCard from "./CreditCard.svelte";
+    import Keypad from "./Keypad.svelte";
+
+    let pci_address_prod = process.env.pci_address_prod
+    let pci_address_testing = process.env.pci_address_testing
+
+    export let testing = false
+    export let submit_url = ""
+    export let submit_secret = ""
+    export let success_callback = function () {
+    }
+    export let error_callback = function () {
+    }
+    export let extra_data = {}
+
+    export let show_card = true
+    export let disable_luhn = false
+    export let force_keypad = false
+
+    export let field_options = {}
+    let fieldSettings = {
+        card_number: {
+            visible: field_options.card_number?.visible ?? true,
+            validate: field_options.card_number?.validate ?? true,
+        },
+        card_holder: {
+            visible: field_options.card_holder?.visible ?? true,
+            validate: field_options.card_holder?.validate ?? true,
+        },
+        expiry: {
+            visible: field_options.expiry?.visible ?? true,
+            validate: field_options.expiry?.validate ?? true,
+        },
+        cvv: {
+            visible: field_options.cvv?.visible ?? true,
+            validate: field_options.cvv?.validate ?? true,
+        }
+    }
+
+    const validate_field = (entry) => fieldSettings[entry].validate && fieldSettings[entry].visible
+
+    let validate = false
+    let cardName = ""
+    let cardNumber = ""
+    let cardMonth = ""
+    let cardYear = ""
+    let cardCvv = ""
+
+    let expiry;
+    $: expiry = (cardMonth || "MM") + "/" + (cardYear ? String(cardYear).slice(2, 4) : "YY")
+
+    let amexCardMask = "#### ###### #####"
+    let otherCardMask = "#### #### #### ####"
+    let cardType;
+    let isCardFlipped = false
+    let cardNumberMask;
+    let result;
+    let cardKeypad = false;
+
+    onMount(function () {
+        window.addEventListener('load', () => document.getElementById("cardNumber").focus())
+    })
+
+    let minCardYear = new Date().getFullYear().toString(10)
+    $: minCardMonth = cardYear === minCardYear ? new Date().getMonth() + 1 : 1
+    $: cardMonth = cardMonth < minCardMonth ? '' : cardMonth
+
+    $: {
+        if (cardNumber.match(new RegExp("^3[47]\\d{0,13}")) != null) cardType = "amex";
+        else if (cardNumber.match(new RegExp("^5[1-5]")) != null) cardType = "mastercard";
+        else if (cardNumber.match(new RegExp("^(?:6011|65\\d{0,2}|64[4-9]\\d?)\\d{0,12}")) != null) cardType = "discover";
+        else if (cardNumber.match(new RegExp("^3(?:0([0-5]|9)|[689]\\d?)\\d{0,11}")) != null) cardType = "diners";
+        else if (cardNumber.match(new RegExp("^4\\d{0,15}")) != null) cardType = "visa";
+        else if (cardNumber.match(new RegExp("^(?:2131|1800)\\d{0,11}")) != null) cardType = "jcb1";
+        else if (cardNumber.match(new RegExp("^35\\d{0,2}\\d{0,12}")) != null) cardType = "jcb";
+        else if (cardNumber.match(new RegExp("^(?:5[0678]\\d{0,2}|6304|67\\d{0,2})\\d{0,12}")) != null) cardType = "maestro";
+        else if (cardNumber.match(new RegExp("^62\\d{0,14}")) != null) cardType = "union";
+        else cardType = "other"; // default type
+
+        cardNumberMask = cardType === "amex" || cardType === "jcb1" ? amexCardMask : otherCardMask;
+        cardType = cardType === "jcb1" ? "jcb" : cardType;
+
+        // Credit card input masking
+        cardNumber = cardNumber.substring(0, cardNumberMask.length).replace(/[^0-9]/g, '')
+        for (let index = 0; index < cardNumber.length; index++) {
+            if (cardNumberMask[index] === ' ' && cardNumber[index] !== ' ') {
+                cardNumber = cardNumber.substring(0, index) + ' ' + cardNumber.substring(index)
+            }
+        }
+        if (cardNumber.substring(cardNumber.length - 1) === ' ') {
+            cardNumber = cardNumber.substring(0, cardNumber.length - 1)
+        }
+        cardNumber = cardNumber.substring(0, cardNumberMask.length).replace(/[^0-9 ]/g, '')
+    }
+
+    $: validation_disabled = disable_luhn || !validate
+    $: validNumber = validation_disabled || !validate_field("card_number") || (cardNumber.length > 1 && luhn.isValid(cardNumber.replaceAll(' ', '')))
+    $: validHolder = validation_disabled || !validate_field("card_holder") || cardName
+    $: validMonth = validation_disabled || !validate_field("expiry") || cardMonth
+    $: validYear = validation_disabled || !validate_field("expiry") || cardYear
+    $: validCVV = validation_disabled || !validate_field("cvv") || cardCvv
+    $: allValid = validNumber && validHolder && validMonth && validYear && validCVV
+
+    let pci_address = testing ? pci_address_testing : pci_address_prod
+    async function submit() {
+        validate = true
+        await tick();
+        if (!allValid) {
+            return
+        }
+
+        if (!submit_url || !submit_secret || !submit_url.startsWith("/v1/capture/")) {
+            throw new Error("Submit info not set correctly")
+        }
+
+        let url = pci_address + submit_url
+        let submit_data = {
+            ...extra_data,
+            "card_number": cardNumber,
+            "card_holder": cardName,
+            "cvv": cardCvv,
+            "expiry": expiry,
+            "expiry_year": cardYear,
+            "expiry_month": cardMonth,
+            "card_type": cardType,
+            "last_four": cardNumber.slice(-4),
+        }
+        axios({
+            method: 'post',
+            'url': url,
+            data: submit_data,
+            headers: {
+                "X-PCIVault-Capture-Secret": submit_secret
+            }
+        }).then(async function (d) {
+            result = "Card successfully captured."
+            await tick();
+            if (typeof success_callback === 'function') {
+                success_callback(d.data, submit_data)
+            }
+        }).catch(async function (r) {
+            result = "An error occurred, refresh the page and try again."
+            await tick();
+            if (typeof error_callback === 'function') {
+                error_callback({code: r.response.status, data: r.response.data}, submit_data)
+            }
+        })
+    }
+</script>
+
+<div class="card-form">
+  {#if show_card}
+    <div style="padding-bottom: 32px">
+      <CreditCard
+          asset_url={pci_address_prod}
+          cardType={cardType}
+          cardNumberMask={cardNumberMask}
+          isCardFlipped={isCardFlipped}
+          cardNumber={cardNumber}
+          cardName={cardName}
+          expiry={expiry}
+          cardCvv={cardCvv}
+      />
+    </div>
+  {/if}
+  <div class="card-form__inner">
+    {#if fieldSettings.card_number.visible}
+      <div class="card-input">
+        {#if cardKeypad}
+          <Keypad bind:number={cardNumber} on:close={() => cardKeypad = false}/>
+        {/if}
+        <label for="cardNumber" class="card-input__label">
+          Card Number
+          {#if !validNumber}
+            <span class="card-input__error">{cardNumber ? "invalid credit card number" : "required"}</span>
+          {/if}
+        </label>
+        <input type="text" id="cardNumber" class="card-input__input" class:card-input__invalid={!validNumber}
+               bind:value={cardNumber}
+               on:focus={() => cardKeypad = force_keypad}
+               on:keypress={(e) => {cardKeypad && e.preventDefault(); return !cardKeypad}}
+               autocomplete="cc-number">
+      </div>
+    {/if}
+    {#if fieldSettings.card_holder.visible}
+      <div class="card-input">
+        <label for="cardName" class="card-input__label">
+          Card Holder
+          {#if !validHolder}
+            <span class="card-input__error">required</span>
+          {/if}
+        </label>
+        <input type="text" id="cardName" class="card-input__input" class:card-input__invalid={!validHolder}
+               bind:value={cardName} autocomplete="cc-name">
+      </div>
+    {/if}
+    <div class="card-form__row">
+      {#if fieldSettings.expiry.visible}
+        <div class="card-input">
+          <label for="cardMonth" class="card-input__label">
+            Expiration Date
+            {#if !validMonth || !validYear}
+              <span class="card-input__error">required</span>
+            {/if}
+          </label>
+          <div class="card-form__group">
+            <select class="card-input__input select" id="cardMonth" class:card-input__invalid={!validMonth}
+                    bind:value={cardMonth}>
+              <option value="" disabled selected>Month</option>
+              {#each Array(12) as _, n}
+                <option value={(n+1) < 10 ? '0' + (n+1) : (n+1)} disabled={(n+1) < parseInt(minCardMonth)}>
+                  {(n + 1) < 10 ? '0' + (n + 1) : (n + 1)}
+                </option>
+              {/each}
+            </select>
+            <select class="card-input__input select" id="cardYear" class:card-input__invalid={!validYear}
+                    bind:value={cardYear}>
+              <option value="" disabled selected>Year</option>
+              {#each Array(12) as _, n}
+                <option value={(n + parseInt(minCardYear)).toString(10)}>
+                  {(n + parseInt(minCardYear)).toString(10)}
+                </option>
+              {/each}
+            </select>
+          </div>
+        </div>
+      {/if}
+      {#if fieldSettings.cvv.visible}
+        <div class="card-input cvv">
+          <label for="cardCvv" class="card-input__label">
+            CVV
+            {#if !validCVV}
+              <span class="card-input__error">required</span>
+            {/if}
+          </label>
+          <input type="text" class="card-input__input" id="cardCvv" maxlength="4" class:card-input__invalid={!validCVV}
+                 bind:value={cardCvv} on:focus={() => isCardFlipped = true} on:blur={() => isCardFlipped = false}
+                 autocomplete="cc-csc">
+        </div>
+      {/if}
+    </div>
+
+    <button id="pcivault-pcd-form-button-submit" class="card-form__button" on:click={submit}
+            disabled='{!allValid || result}'>
+      SECURE CAPTURE CARD
+    </button>
+    {#if result}
+      <div class="card-input__result {result.includes('error') ? 'card-input__error' : 'card-input__success'}">
+        {result}
+      </div>
+    {/if}
+  </div>
+</div>
+
+<style>
+    @font-face {
+        font-family: "SFProDisplay";
+        src: url("/pcd/SFProDisplay-Light.woff2");
+        font-weight: 300;
+    }
+
+    @font-face {
+        font-family: "SFProDisplay";
+        src: url("/pcd/SFProDisplay-Regular.woff2");
+        font-weight: normal;
+    }
+
+    @font-face {
+        font-family: "SFProDisplay";
+        src: url("/pcd/SFProDisplay-Medium.woff2");
+        font-weight: 500;
+    }
+
+    @font-face {
+        font-family: "SFProDisplay";
+        src: url("/pcd/SFProDisplay-Bold.woff2");
+        font-weight: bold;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    *:focus {
+        outline: none;
+    }
+
+    .card-form {
+        max-width: 512px;
+        margin: auto;
+        width: 100%;
+
+        box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
+        border-radius: 10px;
+        padding: 16px 0 16px 0;
+
+        font-family: "SFProDisplay", sans-serif;
+    }
+
+    .card-form__inner {
+        padding: 16px;
+    }
+
+    .card-form__row {
+        width: 100%;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        align-content: stretch;
+        flex-wrap: wrap;
+        gap: 0 0.5rem;
+    }
+
+    .card-form__group {
+        width: 100%;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0 0.5rem;
+    }
+
+    .card-form__row .card-input {
+        flex: 1 1 100px;
+    }
+
+    .card-form__button {
+        width: 100%;
+        height: 55px;
+        background: #009844;
+        border: none;
+        border-radius: 5px;
+        font-size: 22px;
+        font-weight: 500;
+
+        box-shadow: 3px 10px 20px 0 rgba(35, 100, 210, 0.3);
+        color: #fff;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    .card-form__button:disabled {
+        background: #A7A5A5;
+        cursor: default;
+    }
+
+    .card-input {
+        margin-bottom: 16px;
+    }
+
+    .card-input.cvv {
+        min-width: 5rem;
+        flex-shrink: 1;
+    }
+
+    .card-input__label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #1a3b5d;
+        width: 100%;
+        display: block;
+    }
+
+    .card-input__input {
+        width: 100%;
+        min-width: 7.5rem;
+        height: 50px;
+        border-radius: 5px;
+        box-shadow: none;
+        border: 1px solid #ced6e0;
+        transition: all 0.3s ease-in-out;
+        font-size: 18px;
+        padding: 5px 15px;
+        background: none;
+        color: #1a3b5d;
+        font-family: "Source Sans Pro", sans-serif;
+    }
+
+    .card-input__input:hover, .card-input__input:focus {
+        border-color: #3d9cff;
+    }
+
+    .card-input__input:focus {
+        box-shadow: 0 10px 20px -13px rgba(32, 56, 117, 0.35);
+    }
+
+    .card-input__input.select {
+        -webkit-appearance: none;
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAeCAYAAABuUU38AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUxJREFUeNrM1sEJwkAQBdCsngXPHsQO9O5FS7AAMVYgdqAd2IGCDWgFnryLFQiCZ8EGnJUNimiyM/tnk4HNEAg/8y6ZmMRVqz9eUJvRaSbvutCZ347bXVJy/ZnvTmdJ862Me+hAbZCTs6GHpyUi1tTSvPnqTpoWZPUa7W7ncT3vK4h4zVejy8QzM3WhVUO8ykI6jOxoGA4ig3BLHcNFSCGqGAkig2yqgpEiMsjSfY9LxYQg7L6r0X6wS29YJiYQYecemY+wHrXD1+bklGhpAhBDeu/JfIVGxaAQ9sb8CI+CQSJ+QmJg0Ii/EE2MBiIXooHRQhRCkBhNhBcEhLkwf05ZCG8ICCOpk0MULmvDSY2M8UawIRExLIQIEgHDRoghihgRIgiigBEjgiFATBACAgFgghEwSAAGgoBCBBgYAg5hYKAIFYgHBo6w9RRgAFfy160QuV8NAAAAAElFTkSuQmCC");
+        background-size: 12px;
+        background-position: 90% center;
+        background-repeat: no-repeat;
+        padding-right: 30px;
+    }
+
+    .card-input__invalid {
+        border-color: red;
+    }
+
+    .card-input__error {
+        color: red;
+        font-style: italic;
+    }
+
+    .card-input__success {
+        color: #12B331;
+    }
+
+    .card-input__result {
+        margin-top: 16px;
+        text-align: center;
+        font-style: italic;
+    }
+</style>

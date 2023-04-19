@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+
+  <link rel="stylesheet" href="/build/pcd_form.css"/>
+  <script src="/build/pcd_form.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PCIVault PCD Form</title>
+</head>
+<body>
+
+<div id="app"></div>
+<script defer>
+    window.pcd_form(document.getElementById("app"), {
+        submit_secret: "your_secret_here",
+        submit_url: "/v1/capture/demo",
+        success_callback: (d) => {
+            console.log(d);
+            alert("success!")
+        },
+        error_callback: (d) => {
+            console.log(d);
+            alert("an error occurred")
+        },
+        extra_data: {"address": "42 Wallaby Way Sydney"},
+        show_card: true,
+        disable_luhn: false,
+        force_keypad: false,
+        field_options: {}
+    })
+</script>
+
+</body>
+</html>
