@@ -112,6 +112,10 @@
             }
         })
     }
+
+    let submit_button_width = 300
+    let submit_font_size
+    $: submit_font_size = Math.round(0.05 * submit_button_width)
 </script>
 
 <div class="ach-form">
@@ -185,8 +189,9 @@
       </div>
     {/if}
 
-    <button id="pcivault-pcd-form-button-submit" class="ach-form__button" on:click={submit}
-            disabled='{!allValid || result}'>
+    <button id="pcivault-ach-form-button-submit" class="ach-form__button" on:click={submit}
+            disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
+            style="font-size:{submit_font_size}px;">
       SECURE CAPTURE ACCOUNT
     </button>
     {#if result}
@@ -292,11 +297,6 @@
         margin-bottom: 16px;
     }
 
-    .ach-input.cvv {
-        min-width: 5rem;
-        flex-shrink: 1;
-    }
-
     .ach-input__label {
         font-size: 14px;
         margin-bottom: 5px;
@@ -327,15 +327,6 @@
 
     .ach-input__input:focus {
         box-shadow: 0 10px 20px -13px rgba(32, 56, 117, 0.35);
-    }
-
-    .ach-input__input.select {
-        -webkit-appearance: none;
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAeCAYAAABuUU38AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUxJREFUeNrM1sEJwkAQBdCsngXPHsQO9O5FS7AAMVYgdqAd2IGCDWgFnryLFQiCZ8EGnJUNimiyM/tnk4HNEAg/8y6ZmMRVqz9eUJvRaSbvutCZ347bXVJy/ZnvTmdJ862Me+hAbZCTs6GHpyUi1tTSvPnqTpoWZPUa7W7ncT3vK4h4zVejy8QzM3WhVUO8ykI6jOxoGA4ig3BLHcNFSCGqGAkig2yqgpEiMsjSfY9LxYQg7L6r0X6wS29YJiYQYecemY+wHrXD1+bklGhpAhBDeu/JfIVGxaAQ9sb8CI+CQSJ+QmJg0Ii/EE2MBiIXooHRQhRCkBhNhBcEhLkwf05ZCG8ICCOpk0MULmvDSY2M8UawIRExLIQIEgHDRoghihgRIgiigBEjgiFATBACAgFgghEwSAAGgoBCBBgYAg5hYKAIFYgHBo6w9RRgAFfy160QuV8NAAAAAElFTkSuQmCC");
-        background-size: 12px;
-        background-position: 90% center;
-        background-repeat: no-repeat;
-        padding-right: 30px;
     }
 
     .ach-input__invalid {

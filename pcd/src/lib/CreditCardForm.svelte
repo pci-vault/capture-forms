@@ -155,6 +155,10 @@
             }
         })
     }
+
+    let submit_button_width = 300
+    let submit_font_size
+    $: submit_font_size = Math.round(0.05 * submit_button_width)
 </script>
 
 <div class="card-form">
@@ -250,7 +254,8 @@
     </div>
 
     <button id="pcivault-pcd-form-button-submit" class="card-form__button" on:click={submit}
-            disabled='{!allValid || result}'>
+            disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
+            style="font-size:{submit_font_size}px;">
       SECURE CAPTURE CARD
     </button>
     {#if result}
