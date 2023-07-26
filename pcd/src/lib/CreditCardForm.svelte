@@ -25,6 +25,7 @@
     export let show_card = true
     export let disable_luhn = false
     export let force_keypad = false
+    export let strip_spaces = false
 
     export let field_options = {}
     let fieldSettings = {
@@ -125,7 +126,7 @@
         let url = pci_address + submit_url
         let submit_data = {
             ...extra_data,
-            "card_number": cardNumber,
+            "card_number": strip_spaces ? cardNumber.replace(/\s/g, "") : cardNumber,
             "card_holder": cardName,
             "cvv": cardCvv,
             "expiry": expiry,
