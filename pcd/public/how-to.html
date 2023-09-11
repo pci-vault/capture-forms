@@ -25,7 +25,7 @@
   <div id="app"></div>
   <script defer>
       window.pcd_form(document.getElementById("app"), {
-          submit_secret: "your_secret_here",
+          submit_secret: "a0KOA5vGGWdVsRAoqXDwFbCI8sQJZxWnOwZjkrh3I0X-hmCF7ijzsMqaNb9fEiNu",
           submit_url: "/v1/capture/demo",
           success_callback: (d, og) => {
               console.log(d);
@@ -131,7 +131,8 @@
         <p>Optional, default: <code>{}</code>. A javascript object that will be submitted along with the
           payment card data. The following fields of this object will be overwritten by form input:
           <code>card_number</code>, <code>card_holder</code>, <code>cvv</code>, <code>expiry</code>,
-          <code>expiry_year</code>, <code>expiry_month</code>, <code>card_type</code>, <code>last_four</code>.<br />
+          <code>expiry_year</code>, <code>expiry_year_short</code>, <code>expiry_month</code>,
+          <code>card_type</code>, <code>last_four</code>.<br/>
           If <code>extra_data</code> is not an object, the submission behaviour will be undefined.</p>
       </li>
       <li>
