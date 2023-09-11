@@ -131,6 +131,7 @@
             "cvv": cardCvv,
             "expiry": expiry,
             "expiry_year": cardYear,
+            "expiry_year_short": cardYear.slice(-2),
             "expiry_month": cardMonth,
             "card_type": cardType,
             "last_four": cardNumber.slice(-4),
