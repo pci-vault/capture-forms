@@ -71,6 +71,7 @@
         font-size: 24px;
         vertical-align: middle;
         line-height: 56px;
+        color: black;
     }
 
     .dialog {
