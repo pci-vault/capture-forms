@@ -240,6 +240,7 @@
         margin: auto;
         width: 100%;
 
+        background: white;
         box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
         border-radius: 10px;
         padding: 16px 0 16px 0;
