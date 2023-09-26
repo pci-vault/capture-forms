@@ -52,6 +52,8 @@
         bottom: 0;
         left: 0;
         right: 0;
+        height: 100%;
+        width: 100%;
         background-color: rgba(100, 100, 100, 0.27);
         z-index: 1000;
 
