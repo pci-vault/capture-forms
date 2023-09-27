@@ -77,7 +77,7 @@
 
     @font-face {
         font-family: "High Summit";
-        src: url("/high-summit.regular.ttf")
+        src: url("/assets/high-summit.regular.ttf")
     }
 
     .card {
@@ -95,6 +95,10 @@
 
     .card-side {
         position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
         height: 100%;
         box-shadow: 0 20px 60px 0 rgba(14, 42, 90, 0.55);
         border-radius: 16px;

@@ -205,25 +205,25 @@
 <style>
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Light.woff2");
+        src: url("/assets/SFProDisplay-Light.woff2");
         font-weight: 300;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Regular.woff2");
+        src: url("/assets/SFProDisplay-Regular.woff2");
         font-weight: normal;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Medium.woff2");
+        src: url("/assets/SFProDisplay-Medium.woff2");
         font-weight: 500;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Bold.woff2");
+        src: url("/assets/SFProDisplay-Bold.woff2");
         font-weight: bold;
     }
 
@@ -250,24 +250,6 @@
 
     .ach-form__inner {
         padding: 16px;
-    }
-
-    .ach-form__row {
-        width: 100%;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        align-content: stretch;
-        flex-wrap: wrap;
-        gap: 0 0.5rem;
-    }
-
-    .ach-form__group {
-        width: 100%;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 0 0.5rem;
     }
 
     .ach-form__row .ach-input {

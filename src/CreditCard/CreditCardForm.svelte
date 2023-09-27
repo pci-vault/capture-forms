@@ -167,7 +167,7 @@
   {#if show_card}
     <div style="padding-bottom: 32px">
       <CreditCard
-          asset_url={pci_address_prod}
+          asset_url={pci_address_prod + "/assets"}
           cardType={cardType}
           cardNumberMask={cardNumberMask}
           isCardFlipped={isCardFlipped}
@@ -271,25 +271,25 @@
 <style>
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Light.woff2");
+        src: url("/assets/SFProDisplay-Light.woff2");
         font-weight: 300;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Regular.woff2");
+        src: url("/assets/SFProDisplay-Regular.woff2");
         font-weight: normal;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Medium.woff2");
+        src: url("/assets/SFProDisplay-Medium.woff2");
         font-weight: 500;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/SFProDisplay-Bold.woff2");
+        src: url("/assets/SFProDisplay-Bold.woff2");
         font-weight: bold;
     }
 
