@@ -20,6 +20,7 @@
         justify-content: space-around;
         align-items: center;
 
+        box-sizing: content-box;
         border-radius: 8px;
         height: 64px;
         width: 64px;
