@@ -1,11 +1,11 @@
 import App from './App.svelte'
 
-const pcd = (element, settings) => new App({
+const ach = (element, settings) => new App({
   target: element || document.body,
   props: {
     settings: settings,
-    form: "pcd"
+    form: "ach"
   }
 })
 
-window.pcd_form = pcd
+window.ach_form = ach

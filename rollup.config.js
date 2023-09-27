@@ -71,5 +71,44 @@ export default [
         watch: {
             clearScreen: false
         }
+    },
+    {
+        input: 'src/ach_form.js',
+        output: {
+            sourcemap: true,
+            format: 'iife',
+            name: 'app',
+            file: 'public/build/ach_form.js'
+        },
+        plugins: [
+            replace({
+                include: ["src/**/*.svelte"],
+                preventAssignment: true,
+                values: {
+                    "process.env.pci_address_prod": "'" + (process.env.pci_address || (production ? "https://api.pcivault.io" : "")) + "'",
+                    "process.env.pci_address_testing": "'" + (process.env.pci_address || (production ? "https://api-stage.pcivault.io" : "")) + "'",
+                }
+            }),
+            svelte({
+                compilerOptions: {
+                    dev: !production
+                },
+                preprocess: sveltePreprocess({
+                    postcss: true,
+                }),
+            }),
+            css({output: 'ach_form.css'}),
+
+            resolve({
+                browser: true,
+                dedupe: ['svelte']
+            }),
+            commonjs(),
+
+            production && terser()
+        ],
+        watch: {
+            clearScreen: false
+        }
     }
 ];

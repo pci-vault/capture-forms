@@ -8,7 +8,7 @@
     import axios from "axios";
     import luhn from "luhn-js"
     import CreditCard from "./CreditCard.svelte";
-    import Keypad from "./Keypad.svelte";
+    import Keypad from "../lib/Keypad.svelte";
 
     let pci_address_prod = process.env.pci_address_prod
     let pci_address_testing = process.env.pci_address_testing
