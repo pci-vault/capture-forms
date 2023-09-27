@@ -12,7 +12,7 @@
 
     let cardWidth = 100
 
-    $: iconURL = `${asset_url}/pcd/` + (cardType === "other" ? "card-icons/pcivault.svg" : `card-icons/${cardType}.svg`)
+    $: iconURL = `${asset_url}/` + (cardType === "other" ? "card-icons/pcivault.svg" : `card-icons/${cardType}.svg`)
     $: fontSize = 0.05 * cardWidth;
     $: fontSizeSmall = 0.6 * fontSize;
     $: fontSizeBig = 1.4 * fontSize;
@@ -21,11 +21,11 @@
 <div class="card" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
   <div class="card-side front" class:flipped={isCardFlipped}>
     <div class="card-img-cover">
-      <img alt="card" class="card-img" src={`${asset_url}/pcd/card.svg`}>
+      <img alt="card" class="card-img" src={`${asset_url}/card.svg`}>
     </div>
     <div class="card-front-grid">
       <img alt="card chip"
-           src={`${asset_url}/pcd/chip.svg`}
+           src={`${asset_url}/chip.svg`}
            class="card-item-chip">
       {#if iconURL && !iconURL.includes("other")}
         {#each [iconURL] as iconURL (iconURL)}
@@ -57,7 +57,7 @@
   </div>
   <div class="card-side back" class:flipped={!isCardFlipped}>
     <div class="card-img-cover">
-      <img alt="card" class="card-img" src={`${asset_url}/pcd/card.svg`}>
+      <img alt="card" class="card-img" src={`${asset_url}/card.svg`}>
     </div>
     <div class="card-back">
       <div class="mag-stripe"></div>
@@ -77,7 +77,7 @@
 
     @font-face {
         font-family: "High Summit";
-        src: url("/pcd/high-summit.regular.ttf")
+        src: url("/high-summit.regular.ttf")
     }
 
     .card {

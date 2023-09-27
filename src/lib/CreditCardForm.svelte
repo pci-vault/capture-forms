@@ -271,25 +271,25 @@
 <style>
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/pcd/SFProDisplay-Light.woff2");
+        src: url("/SFProDisplay-Light.woff2");
         font-weight: 300;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/pcd/SFProDisplay-Regular.woff2");
+        src: url("/SFProDisplay-Regular.woff2");
         font-weight: normal;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/pcd/SFProDisplay-Medium.woff2");
+        src: url("/SFProDisplay-Medium.woff2");
         font-weight: 500;
     }
 
     @font-face {
         font-family: "SFProDisplay";
-        src: url("/pcd/SFProDisplay-Bold.woff2");
+        src: url("/SFProDisplay-Bold.woff2");
         font-weight: bold;
     }
 

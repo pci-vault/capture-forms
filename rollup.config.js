@@ -30,44 +30,46 @@ function serve() {
     };
 }
 
-export default {
-    input: 'src/main.js',
-    output: {
-        sourcemap: true,
-        format: 'iife',
-        name: 'app',
-        file: 'public/build/pcd_form.js'
-    },
-    plugins: [
-        replace({
-            include: ["src/**/*.svelte"],
-            preventAssignment: true,
-            values: {
-                "process.env.pci_address_prod":  "'" + (process.env.pci_address || (production ? "https://api.pcivault.io" : "")) + "'",
-                "process.env.pci_address_testing":  "'" + (process.env.pci_address || (production ? "https://api-stage.pcivault.io" : "")) + "'",
-            }
-        }),
-        svelte({
-            compilerOptions: {
-                dev: !production
-            },
-            preprocess: sveltePreprocess({
-                postcss: true,
+export default [
+    {
+        input: 'src/pcd_form.js',
+        output: {
+            sourcemap: true,
+            format: 'iife',
+            name: 'app',
+            file: 'public/build/pcd_form.js'
+        },
+        plugins: [
+            replace({
+                include: ["src/**/*.svelte"],
+                preventAssignment: true,
+                values: {
+                    "process.env.pci_address_prod": "'" + (process.env.pci_address || (production ? "https://api.pcivault.io" : "")) + "'",
+                    "process.env.pci_address_testing": "'" + (process.env.pci_address || (production ? "https://api-stage.pcivault.io" : "")) + "'",
+                }
             }),
-        }),
-        css({output: 'pcd_form.css'}),
+            svelte({
+                compilerOptions: {
+                    dev: !production
+                },
+                preprocess: sveltePreprocess({
+                    postcss: true,
+                }),
+            }),
+            css({output: 'pcd_form.css'}),
 
-        resolve({
-            browser: true,
-            dedupe: ['svelte']
-        }),
-        commonjs(),
+            resolve({
+                browser: true,
+                dedupe: ['svelte']
+            }),
+            commonjs(),
 
-        !production && serve(),
-        !production && livereload('public'),
-        production && terser()
-    ],
-    watch: {
-        clearScreen: false
+            !production && serve(),
+            !production && livereload('public'),
+            production && terser()
+        ],
+        watch: {
+            clearScreen: false
+        }
     }
-};
+];
