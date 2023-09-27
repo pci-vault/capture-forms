@@ -14,8 +14,11 @@
 </head>
 <body>
 
-<div id="pcd_app"></div>
-<div id="ach_app"></div>
+<div class="form-container">
+  <div id="pcd_app"></div>
+  <div id="ach_app"></div>
+</div>
+
 <script defer>
     window.pcd_form(document.getElementById("pcd_app"), {
         submit_secret: "your_secret_here",
@@ -34,8 +37,7 @@
         force_keypad: true,
         field_options: {}
     })
-</script>
-<script defer>
+
     window.ach_form(document.getElementById("ach_app"), {
         submit_secret: "your_secret_here",
         submit_url: "/v1/capture/demo",
@@ -55,4 +57,22 @@
 </script>
 
 </body>
+
+<style>
+  .form-container {
+      width: 100%;
+      display: flex;
+      gap: 32px;
+  }
+
+  #pcd_app {
+      width: 300px;
+      position: relative;
+  }
+
+  #ach_app {
+      width: 512px;
+  }
+</style>
+
 </html>

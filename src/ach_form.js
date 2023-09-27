@@ -1,10 +1,9 @@
-import App from './App.svelte'
+import App from './ach_form.svelte'
 
 const ach = (element, settings) => new App({
   target: element || document.body,
   props: {
     settings: settings,
-    form: "ach"
   }
 })
 

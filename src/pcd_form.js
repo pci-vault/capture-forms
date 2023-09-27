@@ -1,10 +1,9 @@
-import App from './App.svelte'
+import App from './pcd_form.svelte'
 
 const pcd = (element, settings) => new App({
   target: element || document.body,
   props: {
     settings: settings,
-    form: "pcd"
   }
 })
 
