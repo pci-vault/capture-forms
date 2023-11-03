@@ -26,21 +26,25 @@
     }
 </script>
 
-<div class="overlay">
-  <div class="dialog">
-    <div class="num-display">
+<div id="pcivault-keypad-overlay" class="overlay">
+  <div id="pcivault-keypad-dialog" class="dialog">
+    <div id="pcivault-keypad-num-display" class="num-display">
       {number}
     </div>
-    <div class="pad">
+    <div id="pcivault-keypad-keypad" class="pad">
       {#each keys.slice(0, keys.length - 1) as v}
         <Key value="{v}" on:click={() => number+=v}/>
       {/each}
       <div></div>
       <Key value="{keys[keys.length - 1]}" on:click={() => number+=keys[keys.length - 1]}/>
       <div></div>
-      <div class="bottom-btn btn-cancel" on:click={() => {number = ""; close()}}>CANCEL</div>
-      <div class="bottom-btn btn-back" on:click={() => number = number.substring(0, number.length - 1)}>&lt</div>
-      <div class="bottom-btn btn-done" on:click={close}>DONE</div>
+      <div id="pcivault-keypad-btn-cancel" class="bottom-btn btn-cancel" on:click={() => {number = ""; close()}}>
+        CANCEL
+      </div>
+      <div id="pcivault-keypad-btn-back" class="bottom-btn btn-back"
+           on:click={() => number = number.substring(0, number.length - 1)}>&lt
+      </div>
+      <div id="pcivault-keypad-btn-done" class="bottom-btn btn-done" on:click={close}>DONE</div>
     </div>
   </div>
 </div>
