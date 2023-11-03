@@ -118,17 +118,18 @@
     $: submit_font_size = Math.round(0.05 * submit_button_width)
 </script>
 
-<div class="ach-form">
-  <div class="ach-form__inner">
+<div id="pcivault-ach-form" class="ach-form">
+  <div id="pcivault-ach-form-container" class="ach-form__inner">
     {#if field_settings.routing_number.visible}
-      <div class="ach-input">
+      <div id="pcivault-ach-form-routing-number" class="ach-input">
         {#if routing_number_keypad}
           <Keypad bind:number={routing_number} on:close={() => routing_number_keypad = false}/>
         {/if}
-        <label for="routing_number" class="ach-input__label">
+        <label id="pcivault-ach-form-routing-number-label" for="routing_number" class="ach-input__label">
           Routing Number
           {#if !valid_routing_number}
-            <span class="ach-input__error">{routing_number ? "invalid credit card number" : "required"}</span>
+            <span id="pcivault-ach-form-routing-number-label-error"
+                  class="ach-input__error">{routing_number ? "invalid credit card number" : "required"}</span>
           {/if}
         </label>
         <input type="text" id="routing_number" class="ach-input__input"
@@ -139,14 +140,15 @@
       </div>
     {/if}
     {#if field_settings.account_number.visible}
-      <div class="ach-input">
+      <div id="pcivault-ach-form-account-number" class="ach-input">
         {#if account_number_keypad}
           <Keypad bind:number={account_number} on:close={() => account_number_keypad = false}/>
         {/if}
-        <label for="account_number" class="ach-input__label">
+        <label id="pcivault-ach-form-account-number-label" for="account_number" class="ach-input__label">
           Account Number
           {#if !valid_account_number}
-            <span class="ach-input__error">{account_number ? "invalid credit card number" : "required"}</span>
+            <span id="pcivault-ach-form-account-number-label-error"
+                  class="ach-input__error">{account_number ? "invalid credit card number" : "required"}</span>
           {/if}
         </label>
         <input type="text" id="account_number" class="ach-input__input"
@@ -160,11 +162,12 @@
       <Check account_number={account_number || "123456789"} routing_number={routing_number || "123456789"}/>
     {/if}
     {#if field_settings.account_type.visible}
-      <div class="ach-input">
-        <label for="account_type" class="ach-input__label">
+      <div id="pcivault-ach-form-account-type" class="ach-input">
+        <label id="pcivault-ach-form-account-type-error" for="account_type" class="ach-input__label">
           Account Type
           {#if !valid_account_type}
-            <span class="ach-input__error">{account_type ? "invalid account type" : "required"}</span>
+            <span id="pcivault-ach-form-account-type-error-label"
+                  class="ach-input__error">{account_type ? "invalid account type" : "required"}</span>
           {/if}
         </label>
         <select id="account_type" class="ach-input__input"
@@ -177,11 +180,11 @@
       </div>
     {/if}
     {#if field_settings.account_holder.visible}
-      <div class="ach-input">
-        <label for="account_holder" class="ach-input__label">
+      <div id="pcivault-ach-form-account-holder" class="ach-input">
+        <label id="pcivault-ach-form-account-holder-label" for="account_holder" class="ach-input__label">
           Account Holder
           {#if !valid_account_holder}
-            <span class="ach-input__error">required</span>
+            <span id="pcivault-ach-form-account-holder-label-error" class="ach-input__error">required</span>
           {/if}
         </label>
         <input type="text" id="account_holder" class="ach-input__input" class:ach-input__invalid={!valid_account_holder}
@@ -195,7 +198,8 @@
       SECURE CAPTURE ACCOUNT
     </button>
     {#if result}
-      <div class="ach-input__result {result.includes('error') ? 'ach-input__error' : 'ach-input__success'}">
+      <div id="pcivault-ach-form-submit-result"
+           class="ach-input__result {result.includes('error') ? 'ach-input__error' : 'ach-input__success'}">
         {result}
       </div>
     {/if}
