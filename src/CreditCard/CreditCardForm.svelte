@@ -112,6 +112,7 @@
     $: allValid = validNumber && validHolder && validMonth && validYear && validCVV
 
     let pci_address = testing ? pci_address_testing : pci_address_prod
+
     async function submit() {
         validate = true
         await tick();
@@ -163,31 +164,33 @@
     $: submit_font_size = Math.round(0.05 * submit_button_width)
 </script>
 
-<div class="card-form">
+<div id="pcivault-pcd-form-container" class="card-form">
   {#if show_card}
-    <div style="padding-bottom: 32px">
+    <div id="pcivault-pcd-form-card-container" style="padding-bottom: 32px">
       <CreditCard
-          asset_url={pci_address_prod + "/assets"}
-          cardType={cardType}
-          cardNumberMask={cardNumberMask}
-          isCardFlipped={isCardFlipped}
-          cardNumber={cardNumber}
-          cardName={cardName}
-          expiry={expiry}
-          cardCvv={cardCvv}
+              asset_url={pci_address_prod + "/assets"}
+              cardType={cardType}
+              cardNumberMask={cardNumberMask}
+              isCardFlipped={isCardFlipped}
+              cardNumber={cardNumber}
+              cardName={cardName}
+              expiry={expiry}
+              cardCvv={cardCvv}
       />
     </div>
   {/if}
-  <div class="card-form__inner">
+  <div id="pcivault-pcd-form-inner-container" class="card-form__inner">
     {#if fieldSettings.card_number.visible}
-      <div class="card-input">
+      <div id="pcivault-pcd-form-number-input" class="card-input">
         {#if cardKeypad}
           <Keypad bind:number={cardNumber} on:close={() => cardKeypad = false}/>
         {/if}
-        <label for="cardNumber" class="card-input__label">
+        <label id="pcivault-pcd-form-number-input-label" for="cardNumber" class="card-input__label">
           Card Number
           {#if !validNumber}
-            <span class="card-input__error">{cardNumber ? "invalid credit card number" : "required"}</span>
+            <span id="pcivault-pcd-form-number-input-label-error" class="card-input__error">
+              {cardNumber ? "invalid credit card number" : "required"}
+            </span>
           {/if}
         </label>
         <input type="text" id="cardNumber" class="card-input__input" class:card-input__invalid={!validNumber}
@@ -198,27 +201,27 @@
       </div>
     {/if}
     {#if fieldSettings.card_holder.visible}
-      <div class="card-input">
-        <label for="cardName" class="card-input__label">
+      <div id="pcivault-pcd-form-name-input" class="card-input">
+        <label id="pcivault-pcd-form-name-input-label" for="cardName" class="card-input__label">
           Card Holder
           {#if !validHolder}
-            <span class="card-input__error">required</span>
+            <span id="pcivault-pcd-form-name-input-label-error" class="card-input__error">required</span>
           {/if}
         </label>
         <input type="text" id="cardName" class="card-input__input" class:card-input__invalid={!validHolder}
                bind:value={cardName} autocomplete="cc-name">
       </div>
     {/if}
-    <div class="card-form__row">
+    <div id="pcivault-pcd-form-expiry-cvv-row" class="card-form__row">
       {#if fieldSettings.expiry.visible}
-        <div class="card-input">
-          <label for="cardMonth" class="card-input__label">
+        <div id="pcivault-pcd-form-date-input" class="card-input">
+          <label id="pcivault-pcd-form-date-input-label" for="cardMonth" class="card-input__label">
             Expiration Date
             {#if !validMonth || !validYear}
               <span class="card-input__error">required</span>
             {/if}
           </label>
-          <div class="card-form__group">
+          <div id="pcivault-pcd-form-date-input-group" class="card-form__group">
             <select class="card-input__input select" id="cardMonth" class:card-input__invalid={!validMonth}
                     bind:value={cardMonth}>
               <option value="" disabled selected>Month</option>
@@ -241,11 +244,11 @@
         </div>
       {/if}
       {#if fieldSettings.cvv.visible}
-        <div class="card-input cvv">
-          <label for="cardCvv" class="card-input__label">
+        <div id="pcivault-pcd-form-cvv-input" class="card-input cvv">
+          <label id="pcivault-pcd-form-cvv-input-label" for="cardCvv" class="card-input__label">
             CVV
             {#if !validCVV}
-              <span class="card-input__error">required</span>
+              <span id="pcivault-pcd-form-cvv-input-label-error" class="card-input__error">required</span>
             {/if}
           </label>
           <input type="text" class="card-input__input" id="cardCvv" maxlength="4" class:card-input__invalid={!validCVV}
@@ -261,7 +264,8 @@
       SECURE CAPTURE CARD
     </button>
     {#if result}
-      <div class="card-input__result {result.includes('error') ? 'card-input__error' : 'card-input__success'}">
+      <div id="pcivault-pcd-form-submit-result"
+           class="card-input__result {result.includes('error') ? 'card-input__error' : 'card-input__success'}">
         {result}
       </div>
     {/if}
