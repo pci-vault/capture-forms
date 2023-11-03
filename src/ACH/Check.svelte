@@ -9,7 +9,7 @@
   $: account_display = account_number.padStart(12, "0")
 </script>
 
-<div class="check-container">
+<div id="pcivault-check-svg-container" class="check-container">
   <svg id="check-svg" viewBox="0 0 512 64">
     <linearGradient id="card_background" gradientUnits="userSpaceOnUse" x1="300" y1="0" x2="512" y2="54"
                     gradientTransform="matrix(1 0 0 -1 -50 30.5186)">
