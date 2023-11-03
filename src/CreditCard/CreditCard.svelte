@@ -18,13 +18,14 @@
     $: fontSizeBig = 1.4 * fontSize;
 </script>
 
-<div class="card" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
-  <div class="card-side front" class:flipped={isCardFlipped}>
-    <div class="card-img-cover">
-      <img alt="card" class="card-img" src={`${asset_url}/card.svg`}>
+<div id="pcivault-pcd-card" class="card" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
+  <div id="pcivault-pcd-card-front" class="card-side front" class:flipped={isCardFlipped}>
+    <div id="pcivault-pcd-card-front-image-cover" class="card-img-cover">
+      <img id="pcivault-pcd-card-front-image" alt="card" class="card-img" src={`${asset_url}/card.svg`}>
     </div>
-    <div class="card-front-grid">
-      <img alt="card chip"
+    <div id="pcivault-pcd-card-front-grid" class="card-front-grid">
+      <img id="pcivault-pcd-card-chip"
+           alt="card chip"
            src={`${asset_url}/chip.svg`}
            class="card-item-chip">
       {#if iconURL && !iconURL.includes("other")}
@@ -32,7 +33,7 @@
           <img in:fly={{y:-20}} out:fly={{y:20}} src={iconURL} alt="" class="card-item-logo">
         {/each}
       {/if}
-      <div class="card-number">
+      <div id="pcivault-pcd-card-number" class="card-number">
         {#each cardNumberMask as n, index (index)}
           {#if cardNumber.length > index}
             <span class="card-number-item">{cardNumber[index]}</span>
@@ -41,31 +42,32 @@
           {/if}
         {/each}
       </div>
-      <div class="card-name">
-        <div style="font-size:{fontSizeSmall}px;">Card Holder</div>
-        <div style="font-size:{fontSize}px;">
+      <div id="pcivault-pcd-card-name" class="card-name">
+        <div id="pcivault-pcd-card-name-label" style="font-size:{fontSizeSmall}px;">Card Holder</div>
+        <div id="pcivault-pcd-card-name-value" style="font-size:{fontSize}px;">
           <span>{cardName || "FULL NAME"}</span>
         </div>
       </div>
-      <div class="card-date">
-        <div style="font-size:{fontSizeSmall}px;">Expires</div>
-        <div style="font-size:{fontSize}px;">
+      <div id="pcivault-pcd-card-date" class="card-date">
+        <div id="pcivault-pcd-card-date-label" style="font-size:{fontSizeSmall}px;">Expires</div>
+        <div id="pcivault-pcd-card-date-value" style="font-size:{fontSize}px;">
           <span>{expiry}</span>
         </div>
       </div>
     </div>
   </div>
-  <div class="card-side back" class:flipped={!isCardFlipped}>
-    <div class="card-img-cover">
-      <img alt="card" class="card-img" src={`${asset_url}/card.svg`}>
+  <div id="pcivault-pcd-card-back" class="card-side back" class:flipped={!isCardFlipped}>
+    <div id="pcivault-pcd-card-back-image-cover" class="card-img-cover">
+      <img id="pcivault-pcd-card-back-iamge" alt="card" class="card-img" src={`${asset_url}/card.svg`}>
     </div>
-    <div class="card-back">
-      <div class="mag-stripe"></div>
-      <div class="signature-band">
-        <div class="signature-item" style="font-size:{fontSizeBig}px;"><span>{cardName}</span></div>
-        <div class="cvv-item">{cardCvv}</div>
+    <div id="pcivault-pcd-card-back-box" class="card-back">
+      <div id="pcivault-pcd-card-mag-stripe" class="mag-stripe"></div>
+      <div id="pcivault-pcd-card-siganture-band" class="signature-band">
+        <div id="pcivault-pcd-card-siganture" class="signature-item" style="font-size:{fontSizeBig}px;">
+          <span>{cardName}</span></div>
+        <div id="pcivault-pcd-card-cvv" class="cvv-item">{cardCvv}</div>
       </div>
-      <div class="card-logo-back">
+      <div id="pcivault-pcd-card-logo-back" class="card-logo-back">
         <img src={iconURL} alt="">
       </div>
     </div>
