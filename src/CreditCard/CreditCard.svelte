@@ -28,11 +28,13 @@
            alt="card chip"
            src={`${asset_url}/chip.svg`}
            class="card-item-chip">
-      {#if iconURL && !iconURL.includes("other")}
-        {#each [iconURL] as iconURL (iconURL)}
-          <img in:fly={{y:-20}} out:fly={{y:20}} src={iconURL} alt="" class="card-item-logo">
-        {/each}
-      {/if}
+      <div id="pcivault-pcd-card-logo-container">
+        {#if iconURL && !iconURL.includes("other")}
+          {#each [iconURL] as iconURL (iconURL)}
+            <img in:fly={{y:-20}} out:fly={{y:20}} id="pcivault-pcd-{cardType}-logo" src={iconURL} alt="" class="card-item-logo">
+          {/each}
+        {/if}
+      </div>
       <div id="pcivault-pcd-card-number" class="card-number">
         {#each cardNumberMask as n, index (index)}
           {#if cardNumber.length > index}
