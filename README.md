@@ -1,4 +1,4 @@
-PCIVault PCD Form
+PCI Vault PCD Form
 ===
 
 This PCD (Payment Card Data) form makes it easy for you to collect payment card data and
