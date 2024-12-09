@@ -16,11 +16,10 @@
     export let testing = false
     export let submit_url = ""
     export let submit_secret = ""
-    export let success_callback = function () {
-    }
-    export let error_callback = function () {
-    }
+    export let success_callback = function () {}
+    export let error_callback = function () {}
     export let extra_data = {}
+    export let reference = null
 
     export let show_card = true
     export let disable_luhn = false
@@ -139,6 +138,7 @@
         }
         axios({
             method: 'post',
+            params: reference ? { reference: reference } : undefined,
             'url': url,
             data: submit_data,
             headers: {

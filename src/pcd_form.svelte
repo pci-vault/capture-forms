@@ -1,9 +1,9 @@
 <script>
     import CreditCard from "./CreditCard/CreditCardForm.svelte";
 
-    export let settings = {}
+    export let settings = {};
 </script>
 
 <main>
-  <CreditCard {...settings}/>
+  <CreditCard {...settings} />
 </main>
