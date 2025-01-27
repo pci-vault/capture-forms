@@ -4,6 +4,7 @@ set -e
 cd "$(dirname "$0")" || exit
 
 stage=${1:-"dev"}
+hashing_alg=sha384
 
 if [ "$stage" != "prod" ]; then
   export pci_address="https://api-$stage.pcivault.io"
@@ -11,15 +12,29 @@ fi
 
 npm run build
 
-export AWS_PROFILE=pcivault
-
 echo "--- UPLOADING PCD FORM ---"
 aws s3 cp public/build/pcd_form.js s3://pvs-frontend/"$stage"/pcd/ --acl public-read
 aws s3 cp public/build/pcd_form.css s3://pvs-frontend/"$stage"/pcd/ --acl public-read
 
+echo "--- CALCULATING SRI HASH FOR PCD FORM ---"
+hash=$(./hash.sh public/build/pcd_form.js $hashing_alg)
+echo "Setting [form:hash][pcd:js] to" $hash
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
+hash=$(./hash.sh public/build/pcd_form.css $hashing_alg)
+echo "Setting [form:hash][pcd:css] to" $hash
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
+
 echo "--- UPLOADING ACH FORM ---"
 aws s3 cp public/build/ach_form.js s3://pvs-frontend/"$stage"/ach/ --acl public-read
 aws s3 cp public/build/ach_form.css s3://pvs-frontend/"$stage"/ach/ --acl public-read
+
+echo "--- CALCULATING SRI HASH FOR ACH FORM ---"
+hash=$(./hash.sh public/build/ach_form.js $hashing_alg)
+echo "Setting [form:hash][ach:js] to" $hash
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
+hash=$(./hash.sh public/build/pcd_form.css $hashing_alg)
+echo "Setting [form:hash][ach:css] to" $hash
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
 
 echo "--- UPLOADING SHARED ASSETS ---"
 aws s3 cp public/assets/card.svg s3://pvs-frontend/"$stage"/assets/ --acl public-read
