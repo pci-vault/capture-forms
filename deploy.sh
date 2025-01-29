@@ -12,6 +12,16 @@ fi
 
 npm run build
 
+echo "--- CLEAR SRI HASHES ---"
+echo "Deleting [form:hash][pcd:js]"
+aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js\"}}"
+echo "Deleting [form:hash][pcd:css]"
+aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:css\"}}"
+echo "Deleting [form:hash][ach:js]"
+aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js\"}}"
+echo "Deleting [form:hash][pcd:js]"
+aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js\"}}"
+
 echo "--- UPLOADING PCD FORM ---"
 aws s3 cp public/build/pcd_form.js s3://pvs-frontend/"$stage"/pcd/ --acl public-read
 aws s3 cp public/build/pcd_form.css s3://pvs-frontend/"$stage"/pcd/ --acl public-read
