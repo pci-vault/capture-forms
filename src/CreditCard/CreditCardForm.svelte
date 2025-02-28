@@ -10,8 +10,8 @@
     import CreditCard from "./CreditCard.svelte";
     import Keypad from "../lib/Keypad.svelte";
 
-    let pci_address_prod = process.env.pci_address_prod
-    let pci_address_testing = process.env.pci_address_testing
+    export let pci_address_prod = "";
+    export let pci_address_testing = ""
 
     export let testing = false
     export let submit_url = ""

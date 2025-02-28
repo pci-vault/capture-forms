@@ -5,5 +5,9 @@
 </script>
 
 <main>
-  <CreditCard {...settings} />
+  <CreditCard
+    pci_address_prod={process.env.pci_address_prod}
+    pci_address_testing={process.env.pci_address_testing}
+    {...settings}
+  />
 </main>
