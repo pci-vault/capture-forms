@@ -16,6 +16,11 @@
     export let testing = false
     export let submit_url = ""
     export let submit_secret = ""
+
+    export let retrieve_url = ""
+    export let retrieve_secret = ""
+    export let token = ""
+
     export let success_callback = function () {}
     export let error_callback = function () {}
     export let extra_data = {}
@@ -65,6 +70,15 @@
     let cardNumberMask;
     let result;
     let cardKeypad = false;
+
+    let isRetrieval
+    $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0
+
+    let retrievedCardNumber
+    // $: retrievedCardNumber = cardNumber
+    $: if (isRetrieval) {
+      retrieve()
+    }
 
     onMount(function () {
         window.addEventListener('load', () => document.getElementById("cardNumber").focus())
@@ -159,6 +173,34 @@
         })
     }
 
+    async function retrieve() {
+      await tick();
+
+      if (!retrieve_url || !retrieve_secret || !token || !retrieve_url.startsWith("/v1/retrieve/")) {
+          throw new Error("Retrieve info not set correctly")
+      }
+
+      const url = pci_address + retrieve_url
+      const params = {token: token}
+      if (reference) {
+        params["reference"] = reference;
+      }
+
+      axios({
+        method: 'get',
+        params: params,
+        'url': url,
+        headers: {
+          "X-PCIVault-Retrieve-Secret": retrieve_secret
+        }
+      }).then(async function (data) {
+        cardNumber = data.number;
+        result = "Card successfully retrieved."
+      }).catch(async function (r) {
+        result = "An error occurred, refresh the page and try again."
+      })
+    }
+
     let submit_button_width = 300
     let submit_font_size
     $: submit_font_size = Math.round(0.05 * submit_button_width)
@@ -168,14 +210,14 @@
   {#if show_card}
     <div id="pcivault-pcd-form-card-container" style="padding-bottom: 32px">
       <CreditCard
-              asset_url={pci_address_prod + "/assets"}
-              cardType={cardType}
-              cardNumberMask={cardNumberMask}
-              isCardFlipped={isCardFlipped}
-              cardNumber={cardNumber}
-              cardName={cardName}
-              expiry={expiry}
-              cardCvv={cardCvv}
+        asset_url={pci_address_prod + "/assets"}
+        cardType={cardType}
+        cardNumberMask={cardNumberMask}
+        isCardFlipped={isCardFlipped}
+        cardNumber={cardNumber}
+        cardName={cardName}
+        expiry={expiry}
+        cardCvv={cardCvv}
       />
     </div>
   {/if}
@@ -197,6 +239,7 @@
                bind:value={cardNumber}
                on:focus={() => cardKeypad = force_keypad}
                on:keypress={(e) => {cardKeypad && e.preventDefault(); return !cardKeypad}}
+               disabled={isRetrieval}
                autocomplete="cc-number">
       </div>
     {/if}
@@ -209,7 +252,8 @@
           {/if}
         </label>
         <input type="text" id="cardName" class="card-input__input" class:card-input__invalid={!validHolder}
-               bind:value={cardName} autocomplete="cc-name">
+               bind:value={cardName} autocomplete="cc-name"
+               disabled={isRetrieval} />
       </div>
     {/if}
     <div id="pcivault-pcd-form-expiry-cvv-row" class="card-form__row">
@@ -223,7 +267,8 @@
           </label>
           <div id="pcivault-pcd-form-date-input-group" class="card-form__group">
             <select class="card-input__input select" id="cardMonth" class:card-input__invalid={!validMonth}
-                    bind:value={cardMonth}>
+                    bind:value={cardMonth}
+                    disabled={isRetrieval}>
               <option value="" disabled selected>Month</option>
               {#each Array(12) as _, n}
                 <option value={(n+1) < 10 ? '0' + (n+1) : (n+1)} disabled={(n+1) < parseInt(minCardMonth)}>
@@ -232,7 +277,8 @@
               {/each}
             </select>
             <select class="card-input__input select" id="cardYear" class:card-input__invalid={!validYear}
-                    bind:value={cardYear}>
+                    bind:value={cardYear}
+                    disabled={isRetrieval}>
               <option value="" disabled selected>Year</option>
               {#each Array(12) as _, n}
                 <option value={(n + parseInt(minCardYear)).toString(10)}>
@@ -253,19 +299,21 @@
           </label>
           <input type="text" class="card-input__input" id="cardCvv" maxlength="4" class:card-input__invalid={!validCVV}
                  bind:value={cardCvv} on:focus={() => isCardFlipped = true} on:blur={() => isCardFlipped = false}
-                 autocomplete="cc-csc">
+                 autocomplete="cc-csc" disabled={isRetrieval}>
         </div>
       {/if}
     </div>
 
-    <button id="pcivault-pcd-form-button-submit" class="card-form__button" on:click={submit}
-            disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
-            style="font-size:{submit_font_size}px;">
-      SECURE CAPTURE CARD
-    </button>
+    {#if !isRetrieval}
+      <button id="pcivault-pcd-form-button-submit" class="card-form__button" on:click={submit}
+              disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
+              style="font-size:{submit_font_size}px;">
+        SECURE CAPTURE CARD
+      </button>
+    {/if}
     {#if result}
       <div id="pcivault-pcd-form-submit-result"
-           class="card-input__result {result.includes('error') ? 'card-input__error' : 'card-input__success'}">
+          class="card-input__result {result.includes('error') ? 'card-input__error' : 'card-input__success'}">
         {result}
       </div>
     {/if}

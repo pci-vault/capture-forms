@@ -18,7 +18,7 @@
     $: fontSizeBig = 1.4 * fontSize;
 </script>
 
-<div id="pcivault-pcd-card" class="card" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
+<div id="pcivault-pcd-card" class="card relative" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
   <div id="pcivault-pcd-card-front" class="card-side front" class:flipped={isCardFlipped}>
     <div id="pcivault-pcd-card-front-image-cover" class="card-img-cover">
       <img id="pcivault-pcd-card-front-image" alt="card" class="card-img" src={`${asset_url}/card.svg`}>
