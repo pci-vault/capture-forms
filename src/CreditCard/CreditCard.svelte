@@ -6,9 +6,11 @@
     export let cardNumberMask = "#### #### #### ####"
     export let isCardFlipped = false
     export let cardNumber = ""
+    export let hideCardNumber = false
     export let cardName = ""
     export let expiry = ""
     export let cardCvv = ""
+    export let hideCvv = false
 
     let cardWidth = 100
 
@@ -18,7 +20,7 @@
     $: fontSizeBig = 1.4 * fontSize;
 </script>
 
-<div id="pcivault-pcd-card" class="card relative" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
+<div id="pcivault-pcd-card" class="card" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
   <div id="pcivault-pcd-card-front" class="card-side front" class:flipped={isCardFlipped}>
     <div id="pcivault-pcd-card-front-image-cover" class="card-img-cover">
       <img id="pcivault-pcd-card-front-image" alt="card" class="card-img" src={`${asset_url}/card.svg`}>
@@ -36,7 +38,9 @@
       {/if}
       <div id="pcivault-pcd-card-number" class="card-number">
         {#each cardNumberMask as n, index (index)}
-          {#if cardNumber.length > index}
+          {#if hideCardNumber && index >= (cardNumber.length - 4)}
+            <span class="card-number-item">{cardNumber[index]}</span>
+          {:else if !hideCardNumber && cardNumber.length > index}
             <span class="card-number-item">{cardNumber[index]}</span>
           {:else}
             <span class="card-number-item">{n}</span>
@@ -66,7 +70,13 @@
       <div id="pcivault-pcd-card-siganture-band" class="signature-band">
         <div id="pcivault-pcd-card-siganture" class="signature-item" style="font-size:{fontSizeBig}px;">
           <span>{cardName}</span></div>
-        <div id="pcivault-pcd-card-cvv" class="cvv-item">{cardCvv}</div>
+        <div id="pcivault-pcd-card-cvv" class="cvv-item">
+          {#if hideCvv}
+            {#each cardCvv as cvvItem}*{/each}
+          {:else}
+            {cardCvv}
+          {/if}
+        </div>
       </div>
       <div id="pcivault-pcd-card-logo-back" class="card-logo-back">
         <img src={iconURL} alt="">
@@ -87,6 +97,7 @@
         aspect-ratio: 1.59;
         max-width: 464px;
         min-width: 256px;
+        position: relative;
 
         width: 90%;
         margin: auto;

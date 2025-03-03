@@ -59,6 +59,7 @@
     let cardMonth = ""
     let cardYear = ""
     let cardCvv = ""
+    let extraData = {}
 
     let expiry;
     $: expiry = (cardMonth || "MM") + "/" + (cardYear ? String(cardYear).slice(2, 4) : "YY")
@@ -74,8 +75,6 @@
     let isRetrieval
     $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0
 
-    let retrievedCardNumber
-    // $: retrievedCardNumber = cardNumber
     $: if (isRetrieval) {
       retrieve()
     }
@@ -193,8 +192,35 @@
         headers: {
           "X-PCIVault-Retrieve-Secret": retrieve_secret
         }
-      }).then(async function (data) {
-        cardNumber = data.number;
+      }).then(async function (response) {
+        const data = { ...response.data };
+
+        cardNumber = data.card_number;
+        delete data["card_number"];
+        delete data["last_four"];
+
+        cardName = data.card_holder;
+        delete data["card_holder"];
+
+        cardCvv = data.cvv;
+        delete data["cvv"];
+
+        cardYear = data.expiry_year;
+        delete data["expiry_year"];
+
+        cardMonth = data.expiry_month;
+        delete data["expiry_month"];
+        delete data["expiry_year_short"];
+        delete data["expiry"];
+        
+        cardType = data.card_type;
+        delete data["card_type"];
+
+        // everything left over would have been extra_data
+        if (Object.keys(data).length > 0) {
+          extraData = data;
+        }
+
         result = "Card successfully retrieved."
       }).catch(async function (r) {
         result = "An error occurred, refresh the page and try again."
@@ -215,9 +241,11 @@
         cardNumberMask={cardNumberMask}
         isCardFlipped={isCardFlipped}
         cardNumber={cardNumber}
+        hideCardNumber={isRetrieval}
         cardName={cardName}
         expiry={expiry}
         cardCvv={cardCvv}
+        hideCvv={isRetrieval}
       />
     </div>
   {/if}
@@ -303,7 +331,17 @@
         </div>
       {/if}
     </div>
-
+    {#if isRetrieval && Object.keys(extraData).length}
+    <div class="card-form__row">
+      <span class="extra-data__label">
+        Additional Data
+      </span>
+      <div class="extra-data"> 
+        <pre>{JSON.stringify(extraData, null, 2)}</pre>
+      </div>
+    </div>
+    {/if}
+    
     {#if !isRetrieval}
       <button id="pcivault-pcd-form-button-submit" class="card-form__button" on:click={submit}
               disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
@@ -390,6 +428,20 @@
 
     .card-form__row .card-input {
         flex: 1 1 100px;
+    }
+
+    .card-form__row .extra-data {
+      padding: 10px;
+      background-color: #eee;
+      border-radius: 5px;
+    }
+    .extra-data__label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #1a3b5d;
+        width: 100%;
+        display: block;
     }
 
     .card-form__button {
