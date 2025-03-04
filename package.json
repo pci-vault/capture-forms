@@ -18,6 +18,7 @@
     "@rollup/plugin-commonjs": "^22.0.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^4.0.0",
+    "@tabler/icons-svelte": "^3.30.0",
     "local-web-server": "^5.2.1",
     "rollup": "^2.75.7",
     "rollup-plugin-css-only": "^3.1.0",

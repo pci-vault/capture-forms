@@ -4,9 +4,11 @@
     Ported from https://svelte.dev/repl/153bbcac104f42569bcf82a1fb4ad94e?version=3.12.1
     */
 
-    import {onMount, tick} from 'svelte';
-    import axios from "axios";
-    import luhn from "luhn-js"
+  import {onMount, tick} from 'svelte';
+  import axios from "axios";
+  import luhn from "luhn-js"
+  import {IconCopy, IconEye} from "@tabler/icons-svelte";
+
     import CreditCard from "./CreditCard.svelte";
     import Keypad from "../lib/Keypad.svelte";
 
@@ -72,12 +74,17 @@
     let result;
     let cardKeypad = false;
 
-    let isRetrieval
+    let isCardRetrieved;
+    let isRetrieval;
     $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0
-
+    $: show_card = (!isRetrieval && show_card) || (isRetrieval && isCardRetrieved )
+    
     $: if (isRetrieval) {
       retrieve()
     }
+
+    let cardInputVisible;
+    $: cardInputVisible = !isRetrieval;
 
     onMount(function () {
         window.addEventListener('load', () => document.getElementById("cardNumber").focus())
@@ -221,7 +228,11 @@
           extraData = data;
         }
 
-        result = "Card successfully retrieved."
+        result = "Card data successfully retrieved.";
+        if (cardNumber?.length) {
+          isCardRetrieved = true;
+        }
+
       }).catch(async function (r) {
         result = "An error occurred, refresh the page and try again."
       })
@@ -263,12 +274,33 @@
             </span>
           {/if}
         </label>
-        <input type="text" id="cardNumber" class="card-input__input" class:card-input__invalid={!validNumber}
-               bind:value={cardNumber}
-               on:focus={() => cardKeypad = force_keypad}
-               on:keypress={(e) => {cardKeypad && e.preventDefault(); return !cardKeypad}}
-               disabled={isRetrieval}
-               autocomplete="cc-number">
+
+        {#if cardInputVisible}
+          <input type="text" id="cardNumber" class="card-input__input" class:card-input__invalid={!validNumber}
+                 bind:value={cardNumber}
+                 on:focus={() => cardKeypad = force_keypad}
+                 on:keypress={(e) => {cardKeypad && e.preventDefault(); return !cardKeypad}}
+                 disabled={isRetrieval}
+                 autocomplete="cc-number" />
+        {:else}
+          <input type="password" id="cardNumberHidden" class="card-input__input" class:card-input__invalid={!validNumber}
+                 bind:value={cardNumber}
+                 on:focus={() => cardKeypad = force_keypad}
+                 on:keypress={(e) => {cardKeypad && e.preventDefault(); return !cardKeypad}}
+                 disabled={isRetrieval}
+                 autocomplete="cc-number" />
+        {/if}
+
+        {#if isCardRetrieved}
+          <div class="actions">
+            <span class="action" on:click={() => navigator.clipboard.writeText(cardNumber)} title="Copy to Clipboard">
+              <IconCopy size={16} />
+            </span>
+            <span class="action" on:click={() => cardInputVisible = !cardInputVisible} title="Show Number">
+              <IconEye size={16} />
+            </span>
+          </div>
+        {/if}
       </div>
     {/if}
     {#if fieldSettings.card_holder.visible}
@@ -317,7 +349,7 @@
           </div>
         </div>
       {/if}
-      {#if fieldSettings.cvv.visible}
+      {#if fieldSettings.cvv.visible && !isRetrieval}
         <div id="pcivault-pcd-form-cvv-input" class="card-input cvv">
           <label id="pcivault-pcd-form-cvv-input-label" for="cardCvv" class="card-input__label">
             CVV
@@ -432,8 +464,10 @@
 
     .card-form__row .extra-data {
       padding: 10px;
+      color: #1a3b5d;
       background-color: #eee;
       border-radius: 5px;
+      width: 100%;
     }
     .extra-data__label {
         font-size: 14px;
@@ -466,6 +500,7 @@
 
     .card-input {
         margin-bottom: 16px;
+        position: relative;
     }
 
     .card-input.cvv {
@@ -531,5 +566,16 @@
         margin-top: 16px;
         text-align: center;
         font-style: italic;
+    }
+
+    .card-input .actions {
+      color: #1a3b5d;
+      position: absolute;
+      right: 10px;
+      top: 40px;
+    }
+
+    .card-input .actions .action {
+      cursor: pointer;
     }
 </style>
