@@ -577,5 +577,8 @@
 
     .card-input .actions .action {
       cursor: pointer;
+      display: inline-block;
+      vertical-align: middle;
     }
+
 </style>
