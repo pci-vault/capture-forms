@@ -10,16 +10,14 @@
   "files": [
     "src"
   ],
-  "dependencies": {
-    "@tabler/icons-svelte": "^3.30.0",
-    "axios": "^0.27.2",
-    "luhn-js": "^1.1.2"
-  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^4.0.0",
+    "@tabler/icons-svelte": "^3.30.0",
+    "axios": "^0.27.2",
     "local-web-server": "^5.2.1",
+    "luhn-js": "^1.1.2",
     "rollup": "^2.75.7",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.5",
