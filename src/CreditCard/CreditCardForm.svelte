@@ -205,6 +205,9 @@
         const cardNumberAliases = ["card_number", "number", "n", "pan"];
         for (const cardNumberAlias of cardNumberAliases) {
           cardNumber = data[cardNumberAlias];
+          if (cardNumber) {
+            cardNumber = cardNumber.toString();
+          }
           if (cardNumber && cardNumber.length > 0) {
             delete data[cardNumberAlias];
             break;
