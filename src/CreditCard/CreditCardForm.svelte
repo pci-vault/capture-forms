@@ -7,7 +7,7 @@
   import {onMount, tick} from 'svelte';
   import axios from "axios";
   import luhn from "luhn-js"
-  import {IconCopy, IconEye} from "@tabler/icons-svelte";
+  import {IconClipboard, IconEye, IconClipboardCheck} from "@tabler/icons-svelte";
 
     import CreditCard from "./CreditCard.svelte";
     import Keypad from "../lib/Keypad.svelte";
@@ -202,8 +202,14 @@
       }).then(async function (response) {
         const data = { ...response.data };
 
-        cardNumber = data.card_number;
-        delete data["card_number"];
+        const cardNumberAliases = ["card_number", "number", "n", "pan"];
+        for (const cardNumberAlias of cardNumberAliases) {
+          cardNumber = data[cardNumberAlias];
+          if (cardNumber && cardNumber.length > 0) {
+            delete data[cardNumberAlias];
+            break;
+          }
+        }
         delete data["last_four"];
 
         cardName = data.card_holder;
@@ -222,11 +228,14 @@
         
         cardType = data.card_type;
         delete data["card_type"];
-
+        
         // everything left over would have been extra_data
         if (Object.keys(data).length > 0) {
           extraData = data;
         }
+
+        // ensure that the UI is updated before continuing
+        await tick();
 
         result = "Card data successfully retrieved.";
         if (cardNumber?.length) {
@@ -238,6 +247,12 @@
       })
     }
 
+    const copyNumberToClipboard = async () => {
+      await navigator.clipboard.writeText(cardNumber);
+      isNumberCopiedToClipboard = true;
+    }
+
+    let isNumberCopiedToClipboard = false;
     let submit_button_width = 300
     let submit_font_size
     $: submit_font_size = Math.round(0.05 * submit_button_width)
@@ -252,7 +267,7 @@
         cardNumberMask={cardNumberMask}
         isCardFlipped={isCardFlipped}
         cardNumber={cardNumber}
-        hideCardNumber={isRetrieval}
+        hideCardNumber={isRetrieval && !cardInputVisible}
         cardName={cardName}
         expiry={expiry}
         cardCvv={cardCvv}
@@ -293,8 +308,12 @@
 
         {#if isCardRetrieved}
           <div class="actions">
-            <span class="action" on:click={() => navigator.clipboard.writeText(cardNumber)} title="Copy to Clipboard">
-              <IconCopy size={16} />
+            <span class="action" on:click={copyNumberToClipboard}>
+              {#if isNumberCopiedToClipboard}
+                <span title="Copied to Clipboard" class="action-success"><IconClipboardCheck size={16} /></span>
+              {:else}
+                <span title="Copy to Clipboard"><IconClipboard size={16} /></span>
+              {/if}
             </span>
             <span class="action" on:click={() => cardInputVisible = !cardInputVisible} title="Show Number">
               <IconEye size={16} />
@@ -573,6 +592,10 @@
       position: absolute;
       right: 10px;
       top: 40px;
+    }
+
+    .card-input .actions .action-success {
+      color: #12B331;
     }
 
     .card-input .actions .action {
