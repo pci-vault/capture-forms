@@ -44,7 +44,12 @@
       show_card: true,
       disable_luhn: true,
       force_keypad: false,
-      field_options: {}
+      field_options: {
+        reference: {
+          visible: true,
+          validate: true
+        }
+      }
     })
 
     window.ach_form(document.getElementById("ach_app"), {
@@ -74,7 +79,12 @@
       show_card: true,
       disable_luhn: true,
       force_keypad: false,
-      field_options: {}
+      field_options: {
+        reference: {
+          visible: true,
+          validate: true
+        }
+      }
     })
 
     window.ach_form(document.getElementById("ach_app_retrieve"), {

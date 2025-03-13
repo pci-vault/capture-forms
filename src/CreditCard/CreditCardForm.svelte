@@ -50,6 +50,10 @@
         cvv: {
             visible: field_options.cvv?.visible ?? true,
             validate: field_options.cvv?.validate ?? true,
+        },
+        reference: {
+            visible: field_options.reference?.visible ?? false,
+            validate: field_options.reference?.validate ?? false,
         }
     }
 
@@ -75,6 +79,7 @@
     let cardKeypad = false;
 
     let isCardRetrieved;
+    let isCVVRetrieved;
     let isRetrieval;
     $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0
     $: show_card = (!isRetrieval && show_card) || (isRetrieval && isCardRetrieved )
@@ -84,7 +89,9 @@
     }
 
     let cardInputVisible;
+    let cvvInputVisible;
     $: cardInputVisible = !isRetrieval;
+    $: cvvInputVisible = !isRetrieval;
 
     onMount(function () {
         window.addEventListener('load', () => document.getElementById("cardNumber").focus())
@@ -128,7 +135,8 @@
     $: validMonth = validation_disabled || !validate_field("expiry") || cardMonth
     $: validYear = validation_disabled || !validate_field("expiry") || cardYear
     $: validCVV = validation_disabled || !validate_field("cvv") || cardCvv
-    $: allValid = validNumber && validHolder && validMonth && validYear && validCVV
+    $: validReference = validation_disabled || !validate_field("reference") || reference?.length > 0
+    $: allValid = validNumber && validHolder && validMonth && validYear && validCVV && validReference
 
     let pci_address = testing ? pci_address_testing : pci_address_prod
 
@@ -219,6 +227,9 @@
         delete data["card_holder"];
 
         cardCvv = data.cvv;
+        if (cardCvv?.length) {
+          isCVVRetrieved = true;
+        }
         delete data["cvv"];
 
         cardYear = data.expiry_year;
@@ -371,7 +382,7 @@
           </div>
         </div>
       {/if}
-      {#if fieldSettings.cvv.visible && !isRetrieval}
+      {#if fieldSettings.cvv.visible}
         <div id="pcivault-pcd-form-cvv-input" class="card-input cvv">
           <label id="pcivault-pcd-form-cvv-input-label" for="cardCvv" class="card-input__label">
             CVV
@@ -379,9 +390,36 @@
               <span id="pcivault-pcd-form-cvv-input-label-error" class="card-input__error">required</span>
             {/if}
           </label>
-          <input type="text" class="card-input__input" id="cardCvv" maxlength="4" class:card-input__invalid={!validCVV}
-                 bind:value={cardCvv} on:focus={() => isCardFlipped = true} on:blur={() => isCardFlipped = false}
-                 autocomplete="cc-csc" disabled={isRetrieval}>
+
+          {#if cvvInputVisible}
+            <input type="text" class="card-input__input" id="cardCvv" maxlength="4" class:card-input__invalid={!validCVV}
+              bind:value={cardCvv} on:focus={() => isCardFlipped = true} on:blur={() => isCardFlipped = false}
+              autocomplete="cc-csc" disabled={isRetrieval} />
+          {:else}
+            <input type="password" class="card-input__input" id="cardCvv" maxlength="4" class:card-input__invalid={!validCVV}
+              bind:value={cardCvv} on:focus={() => isCardFlipped = true} on:blur={() => isCardFlipped = false}
+              autocomplete="cc-csc" disabled={isRetrieval} />
+          {/if}
+
+          {#if isCVVRetrieved}
+            <div class="actions">
+              <span class="action" on:click={() => cvvInputVisible = !cvvInputVisible} title="Show CVV">
+                <IconEye size={16} />
+              </span>
+            </div>
+          {/if}
+        </div>
+      {/if}
+      {#if fieldSettings.reference.visible}
+        <div id="pcivault-pcd-form-reference-input" class="card-input reference">
+          <label id="pcivault-pcd-form-reference-input-label" for="reference" class="card-input__label">
+            Reference
+            {#if !validReference}
+              <span id="pcivault-pcd-form-reference-input-label-error" class="card-input__error">required</span>
+            {/if}
+          </label>
+          <input type="text" class="card-input__input" id="reference" class:card-input__invalid={!validReference}
+                 bind:value={reference} autocomplete="cc-reference" disabled={isRetrieval} />
         </div>
       {/if}
     </div>
