@@ -273,6 +273,21 @@
 </script>
 
 <div id="pcivault-pcd-form-container" class="card-form">
+  <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
+    {#if fieldSettings.reference.visible}
+      <div id="pcivault-pcd-form-reference-input" class="card-input reference">
+        <label id="pcivault-pcd-form-reference-input-label" for="reference" class="card-input__label">
+          Reference
+          {#if !validReference}
+            <span id="pcivault-pcd-form-reference-input-label-error" class="card-input__error">required</span>
+          {/if}
+        </label>
+        <input type="text" class="card-input__input" id="reference" class:card-input__invalid={!validReference}
+                bind:value={reference} autocomplete="cc-reference" disabled={isRetrieval} />
+      </div>
+    {/if}
+  </div>
+
   {#if show_card}
     <div id="pcivault-pcd-form-card-container" style="padding-bottom: 32px">
       <CreditCard
@@ -408,18 +423,6 @@
               </span>
             </div>
           {/if}
-        </div>
-      {/if}
-      {#if fieldSettings.reference.visible}
-        <div id="pcivault-pcd-form-reference-input" class="card-input reference">
-          <label id="pcivault-pcd-form-reference-input-label" for="reference" class="card-input__label">
-            Reference
-            {#if !validReference}
-              <span id="pcivault-pcd-form-reference-input-label-error" class="card-input__error">required</span>
-            {/if}
-          </label>
-          <input type="text" class="card-input__input" id="reference" class:card-input__invalid={!validReference}
-                 bind:value={reference} autocomplete="cc-reference" disabled={isRetrieval} />
         </div>
       {/if}
     </div>
