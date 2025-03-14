@@ -85,9 +85,10 @@
   let cardType;
   let isCardFlipped = false;
   let cardNumberMask;
-  let result;
+  let resultMessage;
   let cardKeypad = false;
 
+  let isCardSubmitted = false;
   let isCardRetrieved;
   let isCVVRetrieved;
   let isRetrieval;
@@ -118,6 +119,7 @@
 
       cardType = null;
       isCardFlipped = false;
+      isCardSubmitted = false;
     }
   };
 
@@ -247,14 +249,16 @@
       },
     })
       .then(async function (d) {
-        result = "Card successfully captured.";
+        resultMessage = "Card successfully captured.";
+        isCardSubmitted = true;
         await tick();
         if (typeof success_callback === "function") {
           success_callback(d.data, submit_data);
         }
       })
       .catch(async function (r) {
-        result = "An error occurred, refresh the page and try again.";
+        resultMessage = "An error occurred, refresh the page and try again.";
+        isCardSubmitted = false;
         await tick();
         if (typeof error_callback === "function") {
           error_callback(
@@ -335,13 +339,13 @@
         // ensure that the UI is updated before continuing
         await tick();
 
-        result = "Card data successfully retrieved.";
+        resultMessage = "Card data successfully retrieved.";
         if (cardNumber?.length) {
           isCardRetrieved = true;
         }
       })
       .catch(async function (r) {
-        result = "An error occurred, refresh the page and try again.";
+        resultMessage = "An error occurred, refresh the page and try again.";
       });
   }
 
@@ -629,21 +633,21 @@
         id="pcivault-pcd-form-button-submit"
         class="card-form__button"
         on:click={submit}
-        disabled={!allValid || result}
+        disabled={!allValid || isCardSubmitted}
         bind:clientWidth={submit_button_width}
         style="font-size:{submit_font_size}px;"
       >
         SECURE CAPTURE CARD
       </button>
     {/if}
-    {#if result}
+    {#if resultMessage}
       <div
         id="pcivault-pcd-form-submit-result"
-        class="card-input__result {result.includes('error')
+        class="card-input__result {resultMessage.includes('error')
           ? 'card-input__error'
           : 'card-input__success'}"
       >
-        {result}
+        {resultMessage}
       </div>
     {/if}
   </div>
