@@ -7,10 +7,14 @@
     "dev": "rollup -c -w",
     "start": "ws --directory public --verbose"
   },
+  "files": [
+    "src"
+  ],
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^4.0.0",
+    "@tabler/icons-svelte": "^3.30.0",
     "axios": "^0.27.2",
     "local-web-server": "^5.2.1",
     "luhn-js": "^1.1.2",

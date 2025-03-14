@@ -5,12 +5,14 @@
     import Keypad from "../lib/Keypad.svelte";
     import Check from "./Check.svelte";
 
-    let pci_address_prod = process.env.pci_address_prod
-    let pci_address_testing = process.env.pci_address_testing
+    export let pci_address_prod = "";
+    export let pci_address_testing = "";
 
     export let testing = false
     export let submit_url = ""
     export let submit_secret = ""
+    export let retrieve_url = ""
+    export let retrieve_secret = ""
     export let success_callback = function () {
     }
     export let error_callback = function () {
@@ -58,6 +60,9 @@
     let result;
     let routing_number_keypad = false;
     let account_number_keypad = false;
+
+    let isRetrieval
+    $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0
 
     onMount(function () {
         window.addEventListener('load', () => document.getElementById("routing_number").focus())
@@ -122,7 +127,7 @@
   <div id="pcivault-ach-form-container" class="ach-form__inner">
     {#if field_settings.routing_number.visible}
       <div id="pcivault-ach-form-routing-number" class="ach-input">
-        {#if routing_number_keypad}
+        {#if routing_number_keypad && !isRetrieval}
           <Keypad bind:number={routing_number} on:close={() => routing_number_keypad = false}/>
         {/if}
         <label id="pcivault-ach-form-routing-number-label" for="routing_number" class="ach-input__label">
@@ -136,12 +141,13 @@
                class:ach-input__invalid={!valid_routing_number}
                bind:value={routing_number}
                on:focus={() => routing_number_keypad = force_keypad}
-               on:keypress={(e) => {routing_number_keypad && e.preventDefault(); return !routing_number_keypad}}>
+               on:keypress={(e) => {routing_number_keypad && e.preventDefault(); return !routing_number_keypad}}
+               disabled={isRetrieval} />
       </div>
     {/if}
     {#if field_settings.account_number.visible}
       <div id="pcivault-ach-form-account-number" class="ach-input">
-        {#if account_number_keypad}
+        {#if account_number_keypad && !isRetrieval}
           <Keypad bind:number={account_number} on:close={() => account_number_keypad = false}/>
         {/if}
         <label id="pcivault-ach-form-account-number-label" for="account_number" class="ach-input__label">
@@ -155,7 +161,8 @@
                class:ach-input__invalid={!valid_account_number}
                bind:value={account_number}
                on:focus={() => account_number_keypad = force_keypad}
-               on:keypress={(e) => {account_number_keypad && e.preventDefault(); return !account_number_keypad}}>
+               on:keypress={(e) => {account_number_keypad && e.preventDefault(); return !account_number_keypad}}
+               disabled={isRetrieval} />
       </div>
     {/if}
     {#if show_check}
@@ -172,7 +179,8 @@
         </label>
         <select id="account_type" class="ach-input__input"
                 class:ach-input__invalid={!valid_account_type}
-                bind:value={account_type}>
+                bind:value={account_type}
+                disabled={isRetrieval}>
           {#each account_types as at, id}
             <option value={at}>{at}</option>
           {/each}
@@ -188,18 +196,20 @@
           {/if}
         </label>
         <input type="text" id="account_holder" class="ach-input__input" class:ach-input__invalid={!valid_account_holder}
-               bind:value={account_holder}>
+               bind:value={account_holder} disabled={isRetrieval}>
       </div>
     {/if}
 
-    <button id="pcivault-ach-form-button-submit" class="ach-form__button" on:click={submit}
-            disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
-            style="font-size:{submit_font_size}px;">
-      SECURE CAPTURE ACCOUNT
-    </button>
+    {#if !isRetrieval}
+      <button id="pcivault-ach-form-button-submit" class="ach-form__button" on:click={submit}
+              disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
+              style="font-size:{submit_font_size}px;">
+        SECURE CAPTURE ACCOUNT
+      </button>
+    {/if}
     {#if result}
       <div id="pcivault-ach-form-submit-result"
-           class="ach-input__result {result.includes('error') ? 'ach-input__error' : 'ach-input__success'}">
+          class="ach-input__result {result.includes('error') ? 'ach-input__error' : 'ach-input__success'}">
         {result}
       </div>
     {/if}

@@ -14,48 +14,97 @@
 </head>
 <body>
 
-<div class="form-container">
-  <div id="pcd_app"></div>
-  <div id="ach_app"></div>
-</div>
+  <h2>Capture</h2>
+  <div class="form-container">
+    <div id="pcd_app"></div>
+    <div id="ach_app"></div>
+  </div>
+  <hr/>
+  <h2>Retrieve</h2>
+  <div class="form-container">
+    <div id="pcd_app_retrieve"></div>
+    <div id="ach_app_retrieve"></div>
+  </div>
 
-<script defer>
+  <script defer>
     window.pcd_form(document.getElementById("pcd_app"), {
-        submit_secret: "your_secret_here",
-        submit_url: "/v1/capture/demo",
-        success_callback: (d) => {
-            console.log(d);
-            alert("success!")
-        },
-        error_callback: (d) => {
-            console.log(d);
-            alert("an error occurred")
-        },
-        extra_data: {"address": "42 Wallaby Way Sydney"},
-        reference: "UNIQUEREF",
-        show_card: true,
-        disable_luhn: true,
-        force_keypad: false,
-        field_options: {}
+      testing: true,
+      submit_secret: "Jj2K_6M88UIs4QDWLQTj9X8hZ2GITPNd1EjwsrD3S4M47Lj2Ay7EmTgKO8xxBpRc",
+      submit_url: "/v1/capture/zQGEUyQp2XsaUV3Ahqu3ud",
+      success_callback: (d) => {
+          console.log(d);
+          alert("success!")
+      },
+      error_callback: (d) => {
+          console.log(d);
+          alert("an error occurred")
+      },
+      extra_data: {"address": "42 Wallaby Way Sydney"},
+      reference: "UNIQUEREF",
+      show_card: true,
+      disable_luhn: true,
+      force_keypad: false,
+      field_options: {
+        reference: {
+          visible: true,
+          validate: true
+        }
+      }
     })
 
     window.ach_form(document.getElementById("ach_app"), {
-        submit_secret: "your_secret_here",
-        submit_url: "/v1/capture/demo",
-        success_callback: (d) => {
-            console.log(d);
-            alert("success!")
-        },
-        error_callback: (d) => {
-            console.log(d);
-            alert("an error occurred")
-        },
-        extra_data: {"address": "42 Wallaby Way Sydney"},
-        reference: "UNIQUEREF2",
-        force_keypad: false,
-        field_options: {}
+      testing: true,
+      submit_secret: "your_secret_here",
+      submit_url: "/v1/capture/demo",
+      success_callback: (d) => {
+          console.log(d);
+          alert("success!")
+      },
+      error_callback: (d) => {
+          console.log(d);
+          alert("an error occurred")
+      },
+      extra_data: {"address": "42 Wallaby Way Sydney"},
+      reference: "UNIQUEREF2",
+      force_keypad: false,
+      field_options: {}
     })
-</script>
+
+    window.pcd_form(document.getElementById("pcd_app_retrieve"), {
+      testing: true,
+      retrieve_secret: "ZeA-bkd1OYNNYJTn_p4-1F6P8KanQBMRuN0a5PT5FoBo4wZ7-QBtMM0FHnYntw5K",
+      retrieve_url: "/v1/retrieve/qbPk7CpENiwdWVdF7JyyTP",
+      token: "44c93045e3cf54d23792c7821c42c2386e3040680caaa1ab512aa45091ad8fd1",
+      reference: "UNIQUEREF",
+      show_card: true,
+      disable_luhn: true,
+      force_keypad: false,
+      field_options: {
+        reference: {
+          visible: true,
+          validate: true
+        }
+      }
+    })
+
+    window.ach_form(document.getElementById("ach_app_retrieve"), {
+      testing: true,
+      retrieve_secret: "your_secret_here",
+      retrieve_url: "/v1/retrieve/demo",
+      success_callback: (d) => {
+          console.log(d);
+          alert("success!")
+      },
+      error_callback: (d) => {
+          console.log(d);
+          alert("an error occurred")
+      },
+      extra_data: {"address": "42 Wallaby Way Sydney"},
+      reference: "UNIQUEREF2",
+      force_keypad: false,
+      field_options: {}
+    })
+  </script>
 
 </body>
 
@@ -66,11 +115,11 @@
       gap: 32px;
   }
 
-  #ach_app {
+  #ach_app, #ach_app_retrieve {
       width: 512px;
   }
 
-  #pcd_app {
+  #pcd_app, #pcd_app_retrieve {
       position: relative;
   }
 </style>
