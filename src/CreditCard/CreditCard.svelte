@@ -74,7 +74,7 @@
   </div>
   <div id="pcivault-pcd-card-back" class="card-side back" class:flipped={!isCardFlipped}>
     <div id="pcivault-pcd-card-back-image-cover" class="card-img-cover">
-      <img id="pcivault-pcd-card-back-iamge" alt="card" class="card-img" src={`${asset_url}/card.svg`}>
+      <CardSVG id="pcivault-pcd-card-back-image" {primaryColor} {shadowColor} />
     </div>
     <div id="pcivault-pcd-card-back-box" class="card-back">
       <div id="pcivault-pcd-card-mag-stripe" class="mag-stripe"></div>
