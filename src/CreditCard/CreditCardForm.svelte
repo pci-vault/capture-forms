@@ -39,9 +39,16 @@
   export let force_keypad = false;
   export let strip_spaces = false;
 
-  export let theme = {
+  const defaultTheme = {
     primaryColor: "#009844",
+    successColor: "#12b331",
+    errorColor: "#ff0000",
+    cardShadowColor: "#069848",
+    cardPrimaryColor: "68B645",
+    logo: "",
   };
+
+  export let theme = {};
 
   export let field_options = {};
   let fieldSettings = {
@@ -374,9 +381,18 @@
   let submit_button_width = 300;
   let submit_font_size;
   $: submit_font_size = Math.round(0.05 * submit_button_width);
+
+  const mergedTheme = {...defaultTheme, ...theme};
+  const themeVariables = `
+    --primary-color: ${mergedTheme.primaryColor};
+    --success-color: ${mergedTheme.successColor};
+    --error-color: ${mergedTheme.errorColor};
+  `;
+
+  console.log(mergedTheme);
 </script>
 
-<div id="pcivault-pcd-form-container" class="card-form" style="--primary-color: {theme.primaryColor}">
+<div id="pcivault-pcd-form-container" class="card-form" style={themeVariables}>
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
     {#if fieldSettings.reference.visible}
       <div id="pcivault-pcd-form-reference-input" class="card-input reference">
@@ -419,6 +435,9 @@
         {expiry}
         {cardCvv}
         hideCvv={isRetrieval}
+        logo={mergedTheme.logo}
+        shadowColor={mergedTheme.cardShadowColor}
+        primaryColor={mergedTheme.cardPrimaryColor}
       />
     </div>
   {/if}
@@ -830,16 +849,16 @@
   }
 
   .card-input__invalid {
-    border-color: red;
+    border-color: var(--error-color);
   }
 
   .card-input__error {
-    color: red;
+    color: var(--error-color);
     font-style: italic;
   }
 
   .card-input__success {
-    color: #12b331;
+    color: var(--success-color);
   }
 
   .card-input__result {
@@ -856,7 +875,7 @@
   }
 
   .card-input .actions .action-success {
-    color: #12b331;
+    color: var(--success-color);
   }
 
   .card-input .actions .action {
