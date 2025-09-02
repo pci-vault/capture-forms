@@ -5,7 +5,7 @@
   /*
     Ported from https://svelte.dev/repl/153bbcac104f42569bcf82a1fb4ad94e?version=3.12.1
     */
-
+  import { addMessages, init, _ } from 'svelte-i18n';
   import { onMount, tick } from "svelte";
   import axios from "axios";
   import luhn from "luhn-js";
@@ -39,6 +39,10 @@
   export let force_keypad = false;
   export let strip_spaces = false;
 
+  export let theme = {
+    primaryColor: "#009844",
+  };
+
   export let field_options = {};
   let fieldSettings = {
     card_number: {
@@ -62,6 +66,18 @@
       validate: field_options.reference?.validate ?? false,
     },
   };
+
+  export let translations = {};
+  export let locale = "en";
+  for (const language in translations) {
+    addMessages(language, translations[language]);
+  }
+
+  // initialise i18n locales
+  init({
+    fallbackLocale: 'en',
+    initialLocale: locale,
+  });
 
   const validate_field = (entry) =>
     fieldSettings[entry].validate && fieldSettings[entry].visible;
@@ -249,7 +265,7 @@
       },
     })
       .then(async function (d) {
-        resultMessage = "Card successfully captured.";
+        resultMessage = $_("submit.success", {default: "Card successfully captured."});
         isCardSubmitted = true;
         await tick();
         if (typeof success_callback === "function") {
@@ -257,7 +273,7 @@
         }
       })
       .catch(async function (r) {
-        resultMessage = "An error occurred, refresh the page and try again.";
+        resultMessage = $_("submit.error", {default: "An error occurred, refresh the page and try again."});
         isCardSubmitted = false;
         await tick();
         if (typeof error_callback === "function") {
@@ -339,13 +355,13 @@
         // ensure that the UI is updated before continuing
         await tick();
 
-        resultMessage = "Card data successfully retrieved.";
+        resultMessage = $_("retrieve.success", {default: "Card data successfully retrieved."});
         if (cardNumber?.length) {
           isCardRetrieved = true;
         }
       })
       .catch(async function (r) {
-        resultMessage = "An error occurred, refresh the page and try again.";
+        resultMessage = $_("retrieve.error", {default: "An error occurred, refresh the page and try again."});
       });
   }
 
@@ -360,7 +376,7 @@
   $: submit_font_size = Math.round(0.05 * submit_button_width);
 </script>
 
-<div id="pcivault-pcd-form-container" class="card-form">
+<div id="pcivault-pcd-form-container" class="card-form" style="--primary-color: {theme.primaryColor}">
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
     {#if fieldSettings.reference.visible}
       <div id="pcivault-pcd-form-reference-input" class="card-input reference">
@@ -369,11 +385,11 @@
           for="reference"
           class="card-input__label"
         >
-          Reference
+          {$_('form.reference.label', {default: "Reference"})}
           {#if !validReference}
             <span
               id="pcivault-pcd-form-reference-input-label-error"
-              class="card-input__error">required</span
+              class="card-input__error">{$_('form.reference.required', {default: "required"})}</span
             >
           {/if}
         </label>
@@ -420,13 +436,13 @@
           for="cardNumber"
           class="card-input__label"
         >
-          Card Number
+          {$_('form.card_number.label', {default: "Card Number"})}
           {#if !validNumber}
             <span
               id="pcivault-pcd-form-number-input-label-error"
               class="card-input__error"
             >
-              {cardNumber ? "invalid credit card number" : "required"}
+              {cardNumber ? $_('form.card_number.invalid', {default: "invalid credit card number"}): $_('form.card_number.required', {default: "required"})}
             </span>
           {/if}
         </label>
@@ -494,11 +510,11 @@
           for="cardName"
           class="card-input__label"
         >
-          Card Holder
+          {$_('form.card_holder.label', {default: "Card Holder"})}
           {#if !validHolder}
             <span
               id="pcivault-pcd-form-name-input-label-error"
-              class="card-input__error">required</span
+              class="card-input__error">{$_('form.card_holder.required', {default: "required"})}</span
             >
           {/if}
         </label>
@@ -521,9 +537,9 @@
             for="cardMonth"
             class="card-input__label"
           >
-            Expiration Date
+            {$_('form.expiry.label', {default: "Expiration Date"})}
             {#if !validMonth || !validYear}
-              <span class="card-input__error">required</span>
+              <span class="card-input__error">{$_('form.expiry.required', {default: "required"})}</span>
             {/if}
           </label>
           <div id="pcivault-pcd-form-date-input-group" class="card-form__group">
@@ -534,7 +550,7 @@
               bind:value={cardMonth}
               disabled={isRetrieval}
             >
-              <option value="" disabled selected>Month</option>
+              <option value="" disabled selected>{$_('form.expiry_month.label', {default: "Month"})}</option>
               {#each Array(12) as _, n}
                 <option
                   value={n + 1 < 10 ? "0" + (n + 1) : n + 1}
@@ -551,7 +567,7 @@
               bind:value={cardYear}
               disabled={isRetrieval}
             >
-              <option value="" disabled selected>Year</option>
+              <option value="" disabled selected>{$_('form.expiry_year.label', {default: "Year"})}</option>
               {#each Array(12) as _, n}
                 <option value={(n + parseInt(minCardYear)).toString(10)}>
                   {(n + parseInt(minCardYear)).toString(10)}
@@ -568,11 +584,11 @@
             for="cardCvv"
             class="card-input__label"
           >
-            CVV
+            {$_('form.cvv.label', {default: "CVV"})}
             {#if !validCVV}
               <span
                 id="pcivault-pcd-form-cvv-input-label-error"
-                class="card-input__error">required</span
+                class="card-input__error">{$_('form.cvv.required', {default: "required"})}</span
               >
             {/if}
           </label>
@@ -621,7 +637,7 @@
     </div>
     {#if isRetrieval && Object.keys(extraData).length}
       <div class="card-form__row">
-        <span class="extra-data__label"> Additional Data </span>
+        <span class="extra-data__label">{$_('form.additional_data.label', {default: "Additional Data"})}</span>
         <div class="extra-data">
           <pre>{JSON.stringify(extraData, null, 2)}</pre>
         </div>
@@ -637,7 +653,7 @@
         bind:clientWidth={submit_button_width}
         style="font-size:{submit_font_size}px;"
       >
-        SECURE CAPTURE CARD
+        {$_('form.submit.label', {default: "SECURE CAPTURE CARD"})}
       </button>
     {/if}
     {#if resultMessage}
@@ -744,7 +760,7 @@
   .card-form__button {
     width: 100%;
     height: 55px;
-    background: #009844;
+    background: var(--primary-color);
     border: none;
     border-radius: 5px;
     font-size: 22px;

@@ -49,7 +49,56 @@
           visible: true,
           validate: true
         }
-      }
+      },
+      translations: {
+        "bg": {
+          "card": {
+            "expiry": "Валидна до",
+            "card_holder": "Притежател"
+          },
+          "form": {
+            "retrieve": {
+              "success": "Card data successfully retrieved.",
+              "error": "An error occurred, refresh the page and try again."
+            },
+            "submit": {
+              "label": "СЪХРАНЕТЕ КАРТАТА",
+              "success": "Card successfully captured.",
+              "error": "An error occurred, refresh the page and try again."
+            },
+            "reference": {
+              "label": "Справка",
+              "required": "моля попълнете"
+            },
+            "card_number": {
+              "label": "Номер на картата",
+              "required": "моля попълнете",
+              "invalid": "не валиден номер"
+            },
+            "card_holder": {
+              "label": "Притежател на картата",
+              "required": "моля попълнете"
+            },
+            "expiry": {
+              "label": "Дата на валидност",
+              "required": "моля изберете"
+            },
+            "expiry_month": {
+              "label": "Месец"
+            },
+            "expiry_year": {
+              "label": "Година"
+            },
+            "cvv": {
+              "label": "CVV"
+            },
+            "additional_data": {
+              "label": "Допълнителни данни"
+            }
+          }
+        }
+      },
+      locale: "bg",
     })
 
     window.ach_form(document.getElementById("ach_app"), {
@@ -67,43 +116,49 @@
       extra_data: {"address": "42 Wallaby Way Sydney"},
       reference: "UNIQUEREF2",
       force_keypad: false,
-      field_options: {}
+      field_options: {},
+      translations: {},
+      locale: "en",
     })
 
-    window.pcd_form(document.getElementById("pcd_app_retrieve"), {
-      testing: true,
-      retrieve_secret: "ZeA-bkd1OYNNYJTn_p4-1F6P8KanQBMRuN0a5PT5FoBo4wZ7-QBtMM0FHnYntw5K",
-      retrieve_url: "/v1/retrieve/qbPk7CpENiwdWVdF7JyyTP",
-      token: "44c93045e3cf54d23792c7821c42c2386e3040680caaa1ab512aa45091ad8fd1",
-      reference: "UNIQUEREF",
-      show_card: true,
-      disable_luhn: true,
-      force_keypad: false,
-      field_options: {
-        reference: {
-          visible: true,
-          validate: true
-        }
-      }
-    })
+    // window.pcd_form(document.getElementById("pcd_app_retrieve"), {
+    //   testing: true,
+    //   retrieve_secret: "ZeA-bkd1OYNNYJTn_p4-1F6P8KanQBMRuN0a5PT5FoBo4wZ7-QBtMM0FHnYntw5K",
+    //   retrieve_url: "/v1/retrieve/qbPk7CpENiwdWVdF7JyyTP",
+    //   token: "44c93045e3cf54d23792c7821c42c2386e3040680caaa1ab512aa45091ad8fd1",
+    //   reference: "UNIQUEREF",
+    //   show_card: true,
+    //   disable_luhn: true,
+    //   force_keypad: false,
+    //   field_options: {
+    //     reference: {
+    //       visible: true,
+    //       validate: true
+    //     }
+    //   },
+    //   translations: {},
+    //   locale: "en",
+    // })
 
-    window.ach_form(document.getElementById("ach_app_retrieve"), {
-      testing: true,
-      retrieve_secret: "your_secret_here",
-      retrieve_url: "/v1/retrieve/demo",
-      success_callback: (d) => {
-          console.log(d);
-          alert("success!")
-      },
-      error_callback: (d) => {
-          console.log(d);
-          alert("an error occurred")
-      },
-      extra_data: {"address": "42 Wallaby Way Sydney"},
-      reference: "UNIQUEREF2",
-      force_keypad: false,
-      field_options: {}
-    })
+    // window.ach_form(document.getElementById("ach_app_retrieve"), {
+    //   testing: true,
+    //   retrieve_secret: "your_secret_here",
+    //   retrieve_url: "/v1/retrieve/demo",
+    //   success_callback: (d) => {
+    //       console.log(d);
+    //       alert("success!")
+    //   },
+    //   error_callback: (d) => {
+    //       console.log(d);
+    //       alert("an error occurred")
+    //   },
+    //   extra_data: {"address": "42 Wallaby Way Sydney"},
+    //   reference: "UNIQUEREF2",
+    //   force_keypad: false,
+    //   field_options: {},
+    //   translations: {},
+    //   locale: "en",
+    // })
   </script>
 
 </body>

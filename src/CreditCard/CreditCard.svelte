@@ -1,5 +1,6 @@
 <script>
     import {fly} from 'svelte/transition';
+    import { _ } from 'svelte-i18n';
 
     export let asset_url = "/"
     export let cardType = "other"
@@ -48,13 +49,13 @@
         {/each}
       </div>
       <div id="pcivault-pcd-card-name" class="card-name">
-        <div id="pcivault-pcd-card-name-label" style="font-size:{fontSizeSmall}px;">Card Holder</div>
+        <div id="pcivault-pcd-card-name-label" style="font-size:{fontSizeSmall}px;">{$_('card.card_holder', {default: "Card Holder"})}</div>
         <div id="pcivault-pcd-card-name-value" style="font-size:{fontSize}px;">
           <span>{cardName || "FULL NAME"}</span>
         </div>
       </div>
       <div id="pcivault-pcd-card-date" class="card-date">
-        <div id="pcivault-pcd-card-date-label" style="font-size:{fontSizeSmall}px;">Expires</div>
+        <div id="pcivault-pcd-card-date-label" style="font-size:{fontSizeSmall}px;">{$_('card.expiry', {default: "Expires"})}</div>
         <div id="pcivault-pcd-card-date-value" style="font-size:{fontSize}px;">
           <span>{expiry}</span>
         </div>
