@@ -74,10 +74,16 @@
     },
   };
 
+  let languageOptions = [];
+
   export let translations = {};
   export let locale = "en";
   for (const language in translations) {
     addMessages(language, translations[language]);
+    languageOptions.push({
+      label: language,
+      value: language,
+    });
   }
 
   // initialise i18n locales
@@ -377,22 +383,37 @@
     isNumberCopiedToClipboard = true;
   };
 
+  const setLanguage = (e) => {
+    locale = e.target.value;
+    init({
+      fallbackLocale: 'en',
+      initialLocale: locale,
+    });
+  };
+
   let isNumberCopiedToClipboard = false;
   let submit_button_width = 300;
   let submit_font_size;
   $: submit_font_size = Math.round(0.05 * submit_button_width);
 
   const mergedTheme = {...defaultTheme, ...theme};
-  const themeVariables = `
+  const cssVariables = `
     --primary-color: ${mergedTheme.primaryColor};
     --success-color: ${mergedTheme.successColor};
     --error-color: ${mergedTheme.errorColor};
   `;
-
-  console.log(mergedTheme);
 </script>
 
-<div id="pcivault-pcd-form-container" class="card-form" style={themeVariables}>
+<div id="pcivault-pcd-form-container" class="card-form" style={cssVariables}>
+  {#if languageOptions.length}
+    <select name="language" on:change={setLanguage}>
+      {#each languageOptions as option}
+        <option value={option.value} selected={option.value === locale}>
+          {option.label}
+        </option>
+      {/each} 
+    </select>
+  {/if}
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
     {#if fieldSettings.reference.visible}
       <div id="pcivault-pcd-form-reference-input" class="card-input reference">
