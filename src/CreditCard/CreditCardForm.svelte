@@ -78,6 +78,8 @@
 
   export let translations = {};
   export let locale = "en";
+  export let showLanguageSelector = true;
+
   for (const language in translations) {
     addMessages(language, translations[language]);
     languageOptions.push({
@@ -405,16 +407,18 @@
 </script>
 
 <div id="pcivault-pcd-form-container" class="card-form" style={cssVariables}>
-  {#if languageOptions.length}
-    <select name="language" on:change={setLanguage}>
-      {#each languageOptions as option}
-        <option value={option.value} selected={option.value === locale}>
-          {option.label}
-        </option>
-      {/each} 
-    </select>
-  {/if}
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
+    {#if languageOptions.length && showLanguageSelector}
+      <div class="card-input card-input__language">
+        <select name="language" class="card-input__input select" id="language-input" on:change={setLanguage}>
+          {#each languageOptions as option}
+            <option value={option.value} selected={option.value === locale}>
+              {option.label}
+            </option>
+          {/each} 
+        </select>
+      </div>
+    {/if}
     {#if fieldSettings.reference.visible}
       <div id="pcivault-pcd-form-reference-input" class="card-input reference">
         <label
@@ -903,5 +907,19 @@
     cursor: pointer;
     display: inline-block;
     vertical-align: middle;
+  }
+
+  .card-input__language {
+    padding-bottom: 16px;
+  }
+
+  .card-input__language .select {
+    float: right;
+    min-width: 4em;
+    width: 4em;
+    font-size: 80%;
+    height: auto;
+    padding: 5px;
+    margin: 0 15px;
   }
 </style>

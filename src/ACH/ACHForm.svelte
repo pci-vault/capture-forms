@@ -1,5 +1,6 @@
 <!--suppress CssUnknownTarget -->
 <script>
+    import { addMessages, init, _ } from 'svelte-i18n';
     import {onMount, tick} from 'svelte';
     import axios from "axios";
     import Keypad from "../lib/Keypad.svelte";
@@ -22,6 +23,17 @@
 
     export let force_keypad = false
 
+    const defaultTheme = {
+      primaryColor: "#009844",
+      successColor: "#12b331",
+      errorColor: "#ff0000",
+      cardShadowColor: "#069848",
+      cardPrimaryColor: "68B645",
+      logo: "",
+    };
+
+    export let theme = {};
+
     export let field_options = {}
     let field_settings = {
         routing_number: {
@@ -41,6 +53,26 @@
             validate: field_options.account_type?.validate ?? true,
         },
     }
+
+    let languageOptions = [];
+
+    export let translations = {};
+    export let locale = "en";
+    export let showLanguageSelector = true;
+
+    for (const language in translations) {
+      addMessages(language, translations[language]);
+      languageOptions.push({
+        label: language,
+        value: language,
+      });
+    }
+
+    // initialise i18n locales
+    init({
+      fallbackLocale: 'en',
+      initialLocale: locale,
+    });
 
     const validate_field = (entry) => field_settings[entry].validate && field_settings[entry].visible
 
@@ -104,13 +136,13 @@
                 "X-PCIVault-Capture-Secret": submit_secret
             }
         }).then(async function (d) {
-            result = "Account successfully captured."
+            result = $_('form.ach_submit.success', {default: "Account successfully captured."})
             await tick();
             if (typeof success_callback === 'function') {
                 success_callback(d.data, submit_data)
             }
         }).catch(async function (r) {
-            result = "An error occurred, refresh the page and try again."
+            result = $_('form.ach_submit.error', {default: "An error occurred, refresh the page and try again."})
             await tick();
             if (typeof error_callback === 'function') {
                 error_callback({code: r.response.status, data: r.response.data}, submit_data)
@@ -118,23 +150,49 @@
         })
     }
 
+    const setLanguage = (e) => {
+      locale = e.target.value;
+      init({
+        fallbackLocale: 'en',
+        initialLocale: locale,
+      });
+    };
+
     let submit_button_width = 300
     let submit_font_size
     $: submit_font_size = Math.round(0.05 * submit_button_width)
+
+    const mergedTheme = {...defaultTheme, ...theme};
+    const cssVariables = `
+      --primary-color: ${mergedTheme.primaryColor};
+      --success-color: ${mergedTheme.successColor};
+      --error-color: ${mergedTheme.errorColor};
+    `;
 </script>
 
-<div id="pcivault-ach-form" class="ach-form">
+<div id="pcivault-ach-form" class="ach-form" style={cssVariables}>
   <div id="pcivault-ach-form-container" class="ach-form__inner">
+    {#if languageOptions.length && showLanguageSelector}
+      <div class="ach-input ach-input__language">
+        <select name="language" class="ach-input__input select" id="language-input" on:change={setLanguage}>
+          {#each languageOptions as option}
+            <option value={option.value} selected={option.value === locale}>
+              {option.label}
+            </option>
+          {/each} 
+        </select>
+      </div>
+    {/if}
     {#if field_settings.routing_number.visible}
       <div id="pcivault-ach-form-routing-number" class="ach-input">
         {#if routing_number_keypad && !isRetrieval}
           <Keypad bind:number={routing_number} on:close={() => routing_number_keypad = false}/>
         {/if}
         <label id="pcivault-ach-form-routing-number-label" for="routing_number" class="ach-input__label">
-          Routing Number
+          {$_('form.routing_number.label', {default: "Routing Number"})}
           {#if !valid_routing_number}
             <span id="pcivault-ach-form-routing-number-label-error"
-                  class="ach-input__error">{routing_number ? "invalid credit card number" : "required"}</span>
+                  class="ach-input__error">{routing_number ? $_('form.routing_number.invalid', {default: "invalid routing number"}) : $_('form.routing_number.required', {default: "required"})}</span>
           {/if}
         </label>
         <input type="text" id="routing_number" class="ach-input__input"
@@ -151,10 +209,10 @@
           <Keypad bind:number={account_number} on:close={() => account_number_keypad = false}/>
         {/if}
         <label id="pcivault-ach-form-account-number-label" for="account_number" class="ach-input__label">
-          Account Number
+          {$_('form.account_number.label', {default: "Account Number"})}
           {#if !valid_account_number}
             <span id="pcivault-ach-form-account-number-label-error"
-                  class="ach-input__error">{account_number ? "invalid credit card number" : "required"}</span>
+                  class="ach-input__error">{account_number ? $_('form.account_number.invalid', {default: "invalid account number"}) : $_('form.account_number.required', {default: "required"})}</span>
           {/if}
         </label>
         <input type="text" id="account_number" class="ach-input__input"
@@ -171,10 +229,10 @@
     {#if field_settings.account_type.visible}
       <div id="pcivault-ach-form-account-type" class="ach-input">
         <label id="pcivault-ach-form-account-type-error" for="account_type" class="ach-input__label">
-          Account Type
+          {$_('form.account_type.label', {default: "Account Type"})}
           {#if !valid_account_type}
             <span id="pcivault-ach-form-account-type-error-label"
-                  class="ach-input__error">{account_type ? "invalid account type" : "required"}</span>
+                  class="ach-input__error">{account_type ? $_('form.account_type.invalid', {default: "invalid account type"}) : $_('form.account_type.required', {default: "required"})}</span>
           {/if}
         </label>
         <select id="account_type" class="ach-input__input"
@@ -190,9 +248,9 @@
     {#if field_settings.account_holder.visible}
       <div id="pcivault-ach-form-account-holder" class="ach-input">
         <label id="pcivault-ach-form-account-holder-label" for="account_holder" class="ach-input__label">
-          Account Holder
+          {$_('form.account_holder.label', {default: "Account Holder"})}
           {#if !valid_account_holder}
-            <span id="pcivault-ach-form-account-holder-label-error" class="ach-input__error">required</span>
+            <span id="pcivault-ach-form-account-holder-label-error" class="ach-input__error">{$_('form.account_holder.required', {default: "required"})}</span>
           {/if}
         </label>
         <input type="text" id="account_holder" class="ach-input__input" class:ach-input__invalid={!valid_account_holder}
@@ -204,7 +262,8 @@
       <button id="pcivault-ach-form-button-submit" class="ach-form__button" on:click={submit}
               disabled='{!allValid || result}' bind:clientWidth={submit_button_width}
               style="font-size:{submit_font_size}px;">
-        SECURE CAPTURE ACCOUNT
+
+        {$_('form.ach_submit.label', {default: "SECURE CAPTURE ACCOUNT"})}
       </button>
     {/if}
     {#if result}
@@ -273,7 +332,7 @@
     .ach-form__button {
         width: 100%;
         height: 55px;
-        background: #009844;
+        background: var(--primary-color);
         border: none;
         border-radius: 5px;
         font-size: 22px;
@@ -327,21 +386,35 @@
     }
 
     .ach-input__invalid {
-        border-color: red;
+        border-color: var(--error-color);;
     }
 
     .ach-input__error {
-        color: red;
+        color: var(--error-color);;
         font-style: italic;
     }
 
     .ach-input__success {
-        color: #12B331;
+        color: var(--success-color)
     }
 
     .ach-input__result {
         margin-top: 16px;
         text-align: center;
         font-style: italic;
+    }
+
+    .ach-input__language {
+      padding-bottom: 16px;
+    }
+
+    .ach-input__language .select {
+      float: right;
+      min-width: 4em;
+      width: 4em;
+      font-size: 80%;
+      height: auto;
+      padding: 5px;
+      margin: 0 15px;
     }
 </style>
