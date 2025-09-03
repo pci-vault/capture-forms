@@ -160,7 +160,7 @@
         left: 0;
         top: 0;
         width: 100%;
-        height: 100%;
+        height: 101%;
         border-radius: 16px;
         overflow: hidden;
         z-index: 1;

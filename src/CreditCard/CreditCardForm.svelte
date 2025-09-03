@@ -44,7 +44,7 @@
     success_color: "#12b331",
     error_color: "#ff0000",
     card_shadow_color: "#069848",
-    card_primary_color: "68B645",
+    card_primary_color: "#68B645",
     logo: "",
   };
 
