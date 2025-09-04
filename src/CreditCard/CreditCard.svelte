@@ -16,13 +16,13 @@
 
     let cardWidth = 100
 
-    export let logo = "";
+    export let logoImage = "";
     export let shadowColor = "#069848";
     export let primaryColor = "#68B645";
 
     let defaultLogo = `${asset_url}/card-icons/pcivault.svg`;
-    if (logo.length > 0) {
-      defaultLogo = logo;
+    if (logoImage.length > 0) {
+      defaultLogo = logoImage;
     }
 
     $: iconURL = cardType === "other" ? defaultLogo : `${asset_url}/card-icons/${cardType}.svg`;

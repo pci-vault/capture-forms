@@ -45,7 +45,7 @@
     error_color: "#ff0000",
     card_shadow_color: "#069848",
     card_primary_color: "#68B645",
-    logo: "",
+    logo_image: "",
   };
 
   export let theme = {};
@@ -474,7 +474,7 @@
         {expiry}
         {cardCvv}
         hideCvv={isRetrieval}
-        logo={mergedTheme.logo}
+        logoImage={mergedTheme.logo_image}
         shadowColor={mergedTheme.card_shadow_color}
         primaryColor={mergedTheme.card_primary_color}
       />
