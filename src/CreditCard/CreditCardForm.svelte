@@ -34,7 +34,9 @@
   export let extra_data = {};
   export let reference = null;
 
-  export let show_card = true;
+  export let show_card = true; // deprecated, use hide_card instead
+
+  export let hide_card = false;
   export let disable_luhn = false;
   export let force_keypad = false;
   export let strip_spaces = false;
@@ -124,8 +126,13 @@
   let isCVVRetrieved;
   let isRetrieval;
   $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0;
+
+  // deprecated: use hide_card instead
   $: show_card =
     (!isRetrieval && show_card) || (isRetrieval && isCardRetrieved);
+
+  $: hide_card =
+    (!isRetrieval && hide_card) || (isRetrieval && !isCardRetrieved);
 
   $: if (isRetrieval) {
     retrieve();
@@ -461,7 +468,7 @@
     {/if}
   </div>
 
-  {#if show_card}
+  {#if !hide_card}
     <div id="pcivault-pcd-form-card-container" style="padding-bottom: 32px">
       <CreditCard
         asset_url={pci_address_prod + "/assets"}
