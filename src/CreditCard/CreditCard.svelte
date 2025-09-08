@@ -1,5 +1,7 @@
 <script>
     import {fly} from 'svelte/transition';
+    import { _ } from 'svelte-i18n';
+    import CardSVG from "./CardSVG.svelte";
 
     export let asset_url = "/"
     export let cardType = "other"
@@ -14,7 +16,16 @@
 
     let cardWidth = 100
 
-    $: iconURL = `${asset_url}/` + (cardType === "other" ? "card-icons/pcivault.svg" : `card-icons/${cardType}.svg`)
+    export let logoImage = "";
+    export let shadowColor = "#069848";
+    export let primaryColor = "#68B645";
+
+    let defaultLogo = `${asset_url}/card-icons/pcivault.svg`;
+    if (logoImage.length > 0) {
+      defaultLogo = logoImage;
+    }
+
+    $: iconURL = cardType === "other" ? defaultLogo : `${asset_url}/card-icons/${cardType}.svg`;
     $: fontSize = 0.05 * cardWidth;
     $: fontSizeSmall = 0.6 * fontSize;
     $: fontSizeBig = 1.4 * fontSize;
@@ -23,7 +34,7 @@
 <div id="pcivault-pcd-card" class="card" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
   <div id="pcivault-pcd-card-front" class="card-side front" class:flipped={isCardFlipped}>
     <div id="pcivault-pcd-card-front-image-cover" class="card-img-cover">
-      <img id="pcivault-pcd-card-front-image" alt="card" class="card-img" src={`${asset_url}/card.svg`}>
+      <CardSVG id="pcivault-pcd-card-front-image" {primaryColor} {shadowColor} />
     </div>
     <div id="pcivault-pcd-card-front-grid" class="card-front-grid">
       <img id="pcivault-pcd-card-chip"
@@ -48,13 +59,13 @@
         {/each}
       </div>
       <div id="pcivault-pcd-card-name" class="card-name">
-        <div id="pcivault-pcd-card-name-label" style="font-size:{fontSizeSmall}px;">Card Holder</div>
+        <div id="pcivault-pcd-card-name-label" style="font-size:{fontSizeSmall}px;">{$_('card.card_holder', {default: "Card Holder"})}</div>
         <div id="pcivault-pcd-card-name-value" style="font-size:{fontSize}px;">
           <span>{cardName || "FULL NAME"}</span>
         </div>
       </div>
       <div id="pcivault-pcd-card-date" class="card-date">
-        <div id="pcivault-pcd-card-date-label" style="font-size:{fontSizeSmall}px;">Expires</div>
+        <div id="pcivault-pcd-card-date-label" style="font-size:{fontSizeSmall}px;">{$_('card.expiry', {default: "Expires"})}</div>
         <div id="pcivault-pcd-card-date-value" style="font-size:{fontSize}px;">
           <span>{expiry}</span>
         </div>
@@ -63,7 +74,7 @@
   </div>
   <div id="pcivault-pcd-card-back" class="card-side back" class:flipped={!isCardFlipped}>
     <div id="pcivault-pcd-card-back-image-cover" class="card-img-cover">
-      <img id="pcivault-pcd-card-back-iamge" alt="card" class="card-img" src={`${asset_url}/card.svg`}>
+      <CardSVG id="pcivault-pcd-card-back-image" {primaryColor} {shadowColor} />
     </div>
     <div id="pcivault-pcd-card-back-box" class="card-back">
       <div id="pcivault-pcd-card-mag-stripe" class="mag-stripe"></div>
@@ -149,16 +160,10 @@
         left: 0;
         top: 0;
         width: 100%;
-        height: 100%;
+        height: 101%;
         border-radius: 16px;
         overflow: hidden;
         z-index: 1;
-    }
-
-    .card-img {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
     }
 
     .card-front-grid {
