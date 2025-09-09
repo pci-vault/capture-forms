@@ -5,6 +5,7 @@ cd "$(dirname "$0")" || exit
 
 stage=${1:-"dev"}
 hashing_alg=sha384
+timestamp=$(date +%s)
 
 if [ "$stage" != "prod" ]; then
   export pci_address="https://api-$stage.pcivault.io"
@@ -29,10 +30,10 @@ aws s3 cp public/build/pcd_form.css s3://pvs-frontend/"$stage"/pcd/ --acl public
 echo "--- CALCULATING SRI HASH FOR PCD FORM ---"
 hash=$(./hash.sh public/build/pcd_form.js $hashing_alg)
 echo "Setting [form:hash][pcd:js] to" $hash
-aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js\"}, \"type\": {\"S\": \"js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js\"}, \"type\": {\"S\": \"js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
 hash=$(./hash.sh public/build/pcd_form.css $hashing_alg)
 echo "Setting [form:hash][pcd:css] to" $hash
-aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:css\"}, \"type\": {\"S\": \"css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:css\"}, \"type\": {\"S\": \"css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
 
 echo "--- UPLOADING ACH FORM ---"
 aws s3 cp public/build/ach_form.js s3://pvs-frontend/"$stage"/ach/ --acl public-read
@@ -41,10 +42,10 @@ aws s3 cp public/build/ach_form.css s3://pvs-frontend/"$stage"/ach/ --acl public
 echo "--- CALCULATING SRI HASH FOR ACH FORM ---"
 hash=$(./hash.sh public/build/ach_form.js $hashing_alg)
 echo "Setting [form:hash][ach:js] to" $hash
-aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js\"}, \"type\": {\"S\": \"js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js\"}, \"type\": {\"S\": \"js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
 hash=$(./hash.sh public/build/pcd_form.css $hashing_alg)
 echo "Setting [form:hash][ach:css] to" $hash
-aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:css\"}, \"type\": {\"S\": \"css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}}"
+aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:css\"}, \"type\": {\"S\": \"css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
 
 echo "--- UPLOADING SHARED ASSETS ---"
 aws s3 cp public/assets/card.svg s3://pvs-frontend/"$stage"/assets/ --acl public-read
