@@ -468,7 +468,7 @@
     {/if}
   </div>
 
-  {#if !hide_card}
+  {#if !hide_card && show_card}
     <div id="pcivault-pcd-form-card-container" style="padding-bottom: 32px">
       <CreditCard
         asset_url={pci_address_prod + "/assets"}
