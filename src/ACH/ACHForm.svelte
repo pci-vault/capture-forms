@@ -4,6 +4,7 @@
   import { onMount, tick } from "svelte";
   import axios from "axios";
   import Keypad from "../lib/Keypad.svelte";
+  import { LanguageOptions } from "../lib/translations";
   import Check from "./Check.svelte";
 
   export let pci_address_prod = "";
@@ -29,6 +30,7 @@
     card_primary_color: "68B645",
     logo: "",
   };
+  const fallbackLocale = "en";
 
   export let theme = {};
 
@@ -54,21 +56,37 @@
 
   let languageOptions = [];
 
+  const getLanguageTitle = (code) => {
+    return LanguageOptions.find((option) => option.code === code)?.title || null;
+  };
+
   export let translations = {};
   export let locale = "en";
   export let showLanguageSelector = true;
 
-  for (const language in translations) {
+  let includesFallbackLocale = false;
+  for (const language of Object.keys(translations)) {
     addMessages(language, translations[language]);
+    if (language === fallbackLocale) {
+      includesFallbackLocale = true;
+    }
     languageOptions.push({
-      label: language,
+      label: getLanguageTitle(language) || language,
       value: language,
+    });
+  }
+
+  // if the don't already have custom transaltions for the fallback locale, add the fallback locale as an option
+  if (!includesFallbackLocale && Object.keys(translations).length > 0) {
+    languageOptions.push({
+      label: getLanguageTitle(fallbackLocale) || fallbackLocale,
+      value: fallbackLocale,
     });
   }
 
   // initialise i18n locales
   init({
-    fallbackLocale: "en",
+    fallbackLocale: fallbackLocale,
     initialLocale: locale,
   });
 
@@ -532,10 +550,10 @@
   .ach-input__language .select {
     float: right;
     min-width: 4em;
-    width: 4em;
+    width: auto;
     font-size: 80%;
     height: auto;
-    padding: 5px;
+    padding: 5px 20px 5px 5px;
     margin: 0 15px;
   }
 </style>
