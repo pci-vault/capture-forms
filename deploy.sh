@@ -20,13 +20,13 @@ fi
 npm run build
 
 echo "--- CLEAR SRI HASHES for version $version ---"
-echo "Deleting [form:hash][pcd:js]"
+echo "Deleting [form:hash][pcd:js:$version]"
 aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js:$version\"}}"
-echo "Deleting [form:hash][pcd:css]"
+echo "Deleting [form:hash][pcd:css:$version]"
 aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:css:$version\"}}"
-echo "Deleting [form:hash][ach:js]"
+echo "Deleting [form:hash][ach:js:$version]"
 aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js:$version\"}}"
-echo "Deleting [form:hash][pcd:js]"
+echo "Deleting [form:hash][pcd:js:$version]"
 aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js:$version\"}}"
 
 echo "--- UPLOADING PCD FORM for version $version ---"
@@ -55,13 +55,13 @@ aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_
 
 if [ "$update_latest" == "y" ]; then
   echo "--- CLEAR SRI HASHES for version LATEST ---"
-  echo "Deleting [form:hash][pcd:js]"
+  echo "Deleting [form:hash][pcd:js:LATEST]"
   aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js:LATEST\"}}"
-  echo "Deleting [form:hash][pcd:css]"
+  echo "Deleting [form:hash][pcd:css:LATEST]"
   aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:css:LATEST\"}}"
-  echo "Deleting [form:hash][ach:js]"
+  echo "Deleting [form:hash][ach:js:LATEST]"
   aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js:LATEST\"}}"
-  echo "Deleting [form:hash][pcd:js]"
+  echo "Deleting [form:hash][pcd:js:LATEST]"
   aws dynamodb delete-item --table-name pci_vault_serverless_"$stage" --key "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"pcd:js:LATEST\"}}"
 
   echo "--- UPLOADING PCD FORM for version LATEST ---"
@@ -81,12 +81,12 @@ if [ "$update_latest" == "y" ]; then
   aws s3 cp public/build/ach_form.js s3://pvs-frontend/"$stage"/ach/LATEST/ --acl public-read
   aws s3 cp public/build/ach_form.css s3://pvs-frontend/"$stage"/ach/LATEST/ --acl public-read
 
-  echo "--- CALCULATING SRI HASH FOR ACH FORM version $version ---"
+  echo "--- CALCULATING SRI HASH FOR ACH FORM version LATEST ---"
   hash=$(./hash.sh public/build/ach_form.js $hashing_alg)
-  echo "Setting [form:hash][ach:js:$version] to" $hash
+  echo "Setting [form:hash][ach:js:LATEST] to" $hash
   aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js:LATEST\"}, \"type\": {\"S\": \"js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
   hash=$(./hash.sh public/build/pcd_form.css $hashing_alg)
-  echo "Setting [form:hash][ach:css:$version] to" $hash
+  echo "Setting [form:hash][ach:css:LATEST] to" $hash
   aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:css:LATEST\"}, \"type\": {\"S\": \"css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
 fi
 
