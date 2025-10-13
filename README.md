@@ -10,8 +10,8 @@ You can use the form by adding `pcd_form.js` and `pcd_form.css` to your page, an
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="https://api.pcivault.io/pcd/pcd_form.css" />
-  <script src="https://api.pcivault.io/pcd/pcd_form.js"></script>
+  <link rel="stylesheet" href="https://api.pcivault.io/pcd/LATEST/pcd_form.css" />
+  <script src="https://api.pcivault.io/pcd/LATEST/pcd_form.js"></script>
 </head>
 <body>
   <div id="pcd_form"></div>
@@ -66,6 +66,14 @@ and the response body of the HTTP request. For example:
 }
 ```
 
+reference
+---
+Optional, default: `""`. A unique reference to be submitted to the capture endpoint.
+
+strip_spaces
+---
+Optional, default: `false`. Remove any and all spaces in the card number. This field only strips spaces from the card number, and no other field.
+
 extra_data
 ---
 Optional, default: `{}`. A javascript object that will be submitted along with the
@@ -73,11 +81,35 @@ payment card data. The following field of this object will be overwritten by for
 input: `card_number`, `card_holder`, `cvv`, `expiry`. If `extra_data` is not an object,
 the submission behaviour will be undefined.
 
-show_card
+hide_card
 ---
-Optional, default: `true`. Make this `false` to hide the example credit card.
+Optional, default: `false`. Make this `true` to hide the example credit card.
 
 disable_luhn
 ---
 Optional, default: `false`. The PCD form validates the credit card number against luhn's
 algorithm by default. This behaviour can be switched off by setting this to `true`.
+
+force_keypad
+---
+Optional, default: `false`. Setting this option to `true` will disable keyboard input for the card number field. Instead, a randomised keypad will be displayed on the screen for the user to input the card number with the mouse. This is handy for preventing key-logger exploits.
+
+field_options
+---
+Optional, default: `{}`. A javascript object, specifying which fields to validate or display. The following keys are accepted in the object: `card_number`, `card_holder`, `expiry`, `reference` and `cvv`. Each of these keys are optional, but must have an object value with `validate` and/or `visible` as keys containing `true` or `false` as values. Unspecified, undefined, or null keys will be overridden by `true` values. Invisible fields will not be validated.
+
+theme
+---
+Optional, default: 
+```json
+{
+  "primary_color": "#009844",
+  "success_color": "#12b331",
+  "error_color": "#ff0000",
+  "card_shadow_color": "#069848",
+  "card_primary_color": "#68B645",
+  "logo_image": ""
+}
+```
+A javascript object, specifying custom colours for the card image, buttons and messages.
+
