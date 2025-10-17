@@ -76,6 +76,10 @@
       visible: field_options.reference?.visible ?? false,
       validate: field_options.reference?.validate ?? false,
     },
+    extra_data: {
+      visible: field_options.extra_data?.visible ?? true,
+      validate: false,
+    }
   };
 
   let languageOptions = [];
@@ -730,7 +734,7 @@
         </div>
       {/if}
     </div>
-    {#if isRetrieval && Object.keys(extraData).length}
+    {#if isRetrieval && fieldSettings.extra_data.visible && Object.keys(extraData).length}
       <div class="card-form__row">
         <span class="extra-data__label"
           >{$_("form.additional_data.label", {
