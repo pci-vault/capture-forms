@@ -299,6 +299,15 @@
       card_type: cardType,
       last_four: cardNumber.slice(-4),
     };
+    // remove any empty fields
+    for (const key in submit_data) {
+      if (submit_data[key] === undefined || submit_data[key] === null || submit_data[key] === "" || submit_data[key] === "MM/YY") {
+        delete submit_data[key];
+        if (key == "card_number") {
+          delete submit_data["card_type"];
+        }
+      }
+    }
     axios({
       method: "post",
       params: reference ? { reference: reference } : undefined,

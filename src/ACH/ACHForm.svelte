@@ -163,6 +163,12 @@
       account_holder: account_holder,
       last_four: account_number.slice(-4),
     };
+    // remove any empty fields
+    for (const key in submit_data) {
+      if (submit_data[key] === undefined || submit_data[key] === null || submit_data[key] === "") {
+        delete submit_data[key];
+      }
+    }
     axios({
       method: "post",
       url: url,

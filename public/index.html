@@ -17,6 +17,7 @@
   <h2>Capture</h2>
   <div class="form-container">
     <div id="pcd_app"></div>
+    <div id="pcd_app_update"></div>
     <div id="ach_app"></div>
   </div>
   <hr/>
@@ -31,8 +32,8 @@
       testing: true,
       submit_secret: "Jj2K_6M88UIs4QDWLQTj9X8hZ2GITPNd1EjwsrD3S4M47Lj2Ay7EmTgKO8xxBpRc",
       submit_url: "/v1/capture/zQGEUyQp2XsaUV3Ahqu3ud",
-      success_callback: (d) => {
-          console.log(d);
+      success_callback: (responseData, requestData) => {
+          console.log(responseData, requestData);
           alert("success!")
       },
       error_callback: (d) => {
@@ -49,7 +50,7 @@
         reference: {
           visible: true,
           validate: true
-        }
+        },
       },
       translations: {
         "bg": {
@@ -100,6 +101,39 @@
         }
       },
       locale: "bg",
+      theme: {
+        primary_color: "#989844",
+        card_primary_color: "#989844",
+        card_shadow_color: "#222222",
+        logo: ""
+      }
+    })
+
+    window.pcd_form(document.getElementById("pcd_app_update"), {
+      testing: true,
+      submit_secret: "FG0ZpQsBoW_q9ewXwvU8fk4Z5CIPlnDOKsyMRzFrHEA3VvFKXSpQPCNx32obt8zl",
+      submit_url: "/v1/capture/rt9f9uLefxajMC5vDy4xHj",
+      success_callback: (responseData, requestData) => {
+          console.log(responseData, requestData);
+          alert("success!")
+      },
+      error_callback: (d) => {
+          console.log(d);
+          alert("an error occurred")
+      },
+      extra_data: {"address": "42 Wallaby Way Sydney"},
+      hide_card: true,
+      show_card: false, // deprecated, some people still use it
+      disable_luhn: true,
+      force_keypad: false,
+      field_options: {
+        reference: {visible: false},
+        card_holder: {visible: false},
+        expiry: {visible: false},
+        card_number: {visible: false}
+      },
+      translations: {},
+      locale: "en",
       theme: {
         primary_color: "#989844",
         card_primary_color: "#989844",
