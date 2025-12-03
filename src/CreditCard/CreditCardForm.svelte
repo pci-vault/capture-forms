@@ -271,6 +271,29 @@
 
   let pci_address = testing ? pci_address_testing : pci_address_prod;
 
+  function getField(object, possibleKeys, options) {
+    const {
+      convertToString = false,
+      deleteField = false,
+    } = options;
+
+    for (const key of possibleKeys) {
+      let value = object[key];
+
+      if (value && convertToString) {
+        value = value.toString();
+
+        if (value && value.length > 0) {
+          deleteField && delete object[key];
+          return value;
+        }
+      } else if (value) {
+        deleteField && delete object[key];
+        return value;
+      }
+    }
+  }
+
   async function submit() {
     validate = true;
     await tick();
@@ -372,37 +395,31 @@
         const data = { ...response.data };
 
         const cardNumberAliases = ["card_number", "number", "n", "pan"];
-        for (const cardNumberAlias of cardNumberAliases) {
-          cardNumber = data[cardNumberAlias];
-          if (cardNumber) {
-            cardNumber = cardNumber.toString();
-          }
-          if (cardNumber && cardNumber.length > 0) {
-            delete data[cardNumberAlias];
-            break;
-          }
-        }
+        cardNumber = getField(data, cardNumberAliases, {convertToString: true, deleteField: true});
         delete data["last_four"];
 
-        cardName = data.card_holder;
-        delete data["card_holder"];
+        cardName = getField(data, ["card_holder"], {deleteField: true});
 
-        cardCvv = data.cvv;
+        cardCvv = getField(data, ["cvv", "card_cvv"], {deleteField: true});
         if (cardCvv?.length) {
           isCVVRetrieved = true;
         }
-        delete data["cvv"];
 
-        cardYear = data.expiry_year;
-        delete data["expiry_year"];
+        cardYear = getField(data, ["expiry_year", "card_expiry_year"], {convertToString: true, deleteField: true});
+        if (cardYear && cardYear.length == 2) {
+          cardYear = "20" + cardYear;
+        }
 
-        cardMonth = data.expiry_month;
-        delete data["expiry_month"];
+        cardMonth = getField(data, ["expiry_month", "card_expiry_month"], {convertToString: true, deleteField: true});
+        if (cardMonth && cardMonth.length == 1) {
+          cardMonth = "0" + cardMonth;
+        }
         delete data["expiry_year_short"];
+        delete data["card_expiry_year_short"];
+        delete data["card_expiry"];
         delete data["expiry"];
 
-        cardType = data.card_type;
-        delete data["card_type"];
+        cardType = getField(data, ["card_type"], {deleteField: true});
 
         // everything left over would have been extra_data
         if (Object.keys(data).length > 0) {
@@ -658,7 +675,7 @@
               >
               {#each Array(12) as _, n}
                 <option
-                  value={n + 1 < 10 ? "0" + (n + 1) : n + 1}
+                  value={n + 1 < 10 ? "0" + (n + 1) : "" + (n + 1)}
                   disabled={n + 1 < parseInt(minCardMonth)}
                 >
                   {n + 1 < 10 ? "0" + (n + 1) : n + 1}
