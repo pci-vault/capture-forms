@@ -877,6 +877,11 @@
     border-radius: 5px;
     width: 100%;
   }
+
+  .card-form__row .extra-data pre {
+    overflow: scroll;
+  }
+
   .extra-data__label {
     font-size: 14px;
     margin-bottom: 5px;
