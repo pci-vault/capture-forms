@@ -191,6 +191,7 @@
 
   let minCardYear = new Date().getFullYear().toString(10);
   $: minCardMonth = cardYear === minCardYear ? new Date().getMonth() + 1 : 1;
+  $: cardMonth = cardMonth < minCardMonth ? "" : cardMonth;
 
   $: {
     if (cardNumber.match(new RegExp("^3[47]\\d{0,13}")) != null)
