@@ -301,10 +301,12 @@
       return;
     }
 
+    const captureUrlPattern = new RegExp('\\\/v1\\\/capture\\\/.+', '')
+
     if (
       !submit_url ||
       !submit_secret ||
-      !submit_url.startsWith("/v1/capture/")
+      !captureUrlPattern.test(submit_url)
     ) {
       throw new Error("Submit info not set correctly");
     }
@@ -368,11 +370,13 @@
   async function retrieve() {
     await tick();
 
+    const retrieveUrlPattern = new RegExp('\\\/v1\\\/retrieve\\\/.+', '')
+
     if (
       !retrieve_url ||
       !retrieve_secret ||
       !token ||
-      !retrieve_url.startsWith("/v1/retrieve/")
+      !retrieveUrlPattern.test(retrieve_url)
     ) {
       throw new Error("Retrieve info not set correctly");
     }
