@@ -21,6 +21,7 @@
   export let show_check = true;
   export let additional_fields = [];
   export let force_keypad = false;
+  export let reference = null;
 
   const defaultTheme = {
     primary_color: "#009844",
@@ -36,6 +37,10 @@
 
   export let field_options = {};
   let field_settings = {
+    reference: {
+      visible: field_options.reference?.visible ?? false,
+      validate: field_options.reference?.validate ?? false,
+    },
     routing_number: {
       visible: field_options.routing_number?.visible ?? true,
       validate: field_options.routing_number?.validate ?? true,
@@ -146,6 +151,10 @@
     !validate || !validate_field("account_holder") || account_holder;
   $: valid_account_type =
     !validate || !validate_field("account_type") || account_type;
+  $: validReference =
+    validation_disabled ||
+    !validate_field("reference") ||
+    reference?.length > 0;
   $: additionalFieldsValid =
     validation_disabled ||
     additional_fields.length === 0 ||
@@ -155,6 +164,7 @@
     valid_account_number &&
     valid_account_holder &&
     valid_account_type &&
+    validReference &&
     additionalFieldsValid;
 
   let pci_address = testing ? pci_address_testing : pci_address_prod;
@@ -192,6 +202,7 @@
     }
     axios({
       method: "post",
+      params: reference ? { reference: reference } : undefined,
       url: url,
       data: submit_data,
       headers: {
@@ -257,6 +268,33 @@
             </option>
           {/each}
         </select>
+      </div>
+    {/if}
+    {#if field_settings.reference.visible}
+      <div id="pcivault-ach-form-reference-input" class="ach-input reference">
+        <label
+          id="pcivault-ach-form-reference-input-label"
+          for="reference"
+          class="ach-input__label"
+        >
+          {$_("form.reference.label", { default: "Reference" })}
+          {#if !validReference}
+            <span
+              id="pcivault-ach-form-reference-input-label-error"
+              class="ach-input__error"
+              >{$_("form.reference.required", { default: "required" })}</span
+            >
+          {/if}
+        </label>
+        <input
+          type="text"
+          class="ach-input__input"
+          id="reference"
+          class:ach-input__invalid={!validReference}
+          bind:value={reference}
+          autocomplete="ach-reference"
+          disabled={isRetrieval}
+        />
       </div>
     {/if}
     {#if field_settings.routing_number.visible}

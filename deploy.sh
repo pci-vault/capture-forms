@@ -49,7 +49,7 @@ echo "--- CALCULATING SRI HASH FOR ACH FORM version $version ---"
 hash=$(./hash.sh public/build/ach_form.js $hashing_alg)
 echo "Setting [form:hash][ach:js:$version] to" $hash
 aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js:$version\"}, \"type\": {\"S\": \"js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
-hash=$(./hash.sh public/build/pcd_form.css $hashing_alg)
+hash=$(./hash.sh public/build/ach_form.css $hashing_alg)
 echo "Setting [form:hash][ach:css:$version] to" $hash
 aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:css:$version\"}, \"type\": {\"S\": \"css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
 
@@ -85,7 +85,7 @@ if [ "$update_latest" == "y" ]; then
   hash=$(./hash.sh public/build/ach_form.js $hashing_alg)
   echo "Setting [form:hash][ach:js:LATEST] to" $hash
   aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:js:LATEST\"}, \"type\": {\"S\": \"js\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
-  hash=$(./hash.sh public/build/pcd_form.css $hashing_alg)
+  hash=$(./hash.sh public/build/ach_form.css $hashing_alg)
   echo "Setting [form:hash][ach:css:LATEST] to" $hash
   aws dynamodb put-item --table-name pci_vault_serverless_"$stage" --item "{\"pci_pk\": {\"S\":\"form:hash\"}, \"pci_sk\": {\"S\": \"ach:css:LATEST\"}, \"type\": {\"S\": \"css\"}, \"alg\": {\"S\": \"$hashing_alg\"}, \"value\": {\"S\": \"$hash\"}, \"updated_at\": {\"N\": \"$timestamp\"}}"
 fi
