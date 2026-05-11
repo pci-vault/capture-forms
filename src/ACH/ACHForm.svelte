@@ -414,7 +414,7 @@
         />
       </div>
     {/if}
-    {#if !isRetrieval && additional_fields.length}
+    {#if additional_fields.length}
       <div id="pcivault-ach-form-additional-fields">
         {#each additional_fields as field}
           <div class="ach-input additional-field">

@@ -126,7 +126,6 @@
   let cardMonth = "";
   let cardYear = "";
   let cardCvv = "";
-  let extraData = {};
 
   let expiry;
   $: expiry =
@@ -173,7 +172,7 @@
       cardMonth = "";
       cardYear = "";
       cardCvv = "";
-      extraData = {};
+      extra_data = {};
       reference = "";
 
       cardType = null;
@@ -446,7 +445,7 @@
 
         // everything left over would have been extra_data
         if (Object.keys(data).length > 0) {
-          extraData = data;
+          extra_data = data;
         }
 
         // ensure that the UI is updated before continuing
@@ -783,7 +782,7 @@
         </div>
       {/if}
     </div>
-    {#if !isRetrieval && additional_fields.length}
+    {#if additional_fields.length}
       <div id="pcivault-pcd-form-additional-fields">
         {#each additional_fields as field}
           <div class="card-input additional-field">
@@ -805,12 +804,13 @@
               id={field.name}
               on:input={() => validate && validateAdditionalFields()}
               bind:value={extra_data[field.name]}
+              disabled={isRetrieval}
             />
           </div>
         {/each}
       </div>
     {/if}
-    {#if isRetrieval && fieldSettings.extra_data.visible && Object.keys(extraData).length}
+    {#if isRetrieval && fieldSettings.extra_data.visible && Object.keys(extra_data).length}
       <div class="card-form__row">
         <span class="extra-data__label"
           >{$_("form.additional_data.label", {
@@ -818,7 +818,7 @@
           })}</span
         >
         <div class="extra-data">
-          <pre>{JSON.stringify(extraData, null, 2)}</pre>
+          <pre>{JSON.stringify(extra_data, null, 2)}</pre>
         </div>
       </div>
     {/if}
