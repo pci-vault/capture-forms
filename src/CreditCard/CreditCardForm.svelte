@@ -34,13 +34,12 @@
   export let error_callback = function () {};
   export let extra_data = {};
   export let reference = null;
-
   export let show_card = true; // deprecated, use hide_card instead
-
   export let hide_card = false;
   export let disable_luhn = false;
   export let force_keypad = false;
   export let strip_spaces = false;
+  export let additional_fields = [];
 
   const defaultTheme = {
     primary_color: "#009844",
@@ -189,6 +188,20 @@
     );
   });
 
+  function validateAdditionalFields() {
+    let valid = true;
+    for (const field of additional_fields) {
+      if (field.required && (!extra_data[field.name] || extra_data[field.name].length === 0)) {
+        valid = false;
+        field.valid = false;
+      } else {
+        field.valid = true;
+      }
+    }
+    additional_fields = [...additional_fields]; // trigger reactivity for the additional fields
+    return valid;
+  }
+
   let minCardYear = new Date().getFullYear().toString(10);
   $: minCardMonth = cardYear === minCardYear ? new Date().getMonth() + 1 : 1;
   $: cardMonth = cardMonth < minCardMonth ? "" : cardMonth;
@@ -261,13 +274,18 @@
     validation_disabled ||
     !validate_field("reference") ||
     reference?.length > 0;
+  $: additionalFieldsValid =
+    validation_disabled ||
+    additional_fields.length === 0 ||
+    validateAdditionalFields();
   $: allValid =
     validNumber &&
     validHolder &&
     validMonth &&
     validYear &&
     validCVV &&
-    validReference;
+    validReference &&
+    additionalFieldsValid;
 
   let pci_address = testing ? pci_address_testing : pci_address_prod;
 
@@ -296,6 +314,7 @@
 
   async function submit() {
     validate = true;
+    validateAdditionalFields()
     await tick();
     if (!allValid) {
       return;
@@ -764,6 +783,33 @@
         </div>
       {/if}
     </div>
+    {#if !isRetrieval && additional_fields.length}
+      <div id="pcivault-pcd-form-additional-fields">
+        {#each additional_fields as field}
+          <div class="card-input additional-field">
+            <label
+              for={field.name}
+              class="card-input__label"
+            >
+              {$_(`form.${field.name}.label`, { default: field.label })}
+              {#if field.valid === false && field?.required}
+                <span class="card-input__error">
+                  {$_(`form.${field.name}.required`, { default: "required" })}
+                </span>
+              {/if}
+            </label>
+            <input
+              type="text"
+              class="card-input__input"
+              class:card-input__invalid={field.valid === false && field?.required}
+              id={field.name}
+              on:input={() => validate && validateAdditionalFields()}
+              bind:value={extra_data[field.name]}
+            />
+          </div>
+        {/each}
+      </div>
+    {/if}
     {#if isRetrieval && fieldSettings.extra_data.visible && Object.keys(extraData).length}
       <div class="card-form__row">
         <span class="extra-data__label"
