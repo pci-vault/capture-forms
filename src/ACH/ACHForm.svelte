@@ -19,7 +19,7 @@
   export let error_callback = function () {};
   export let extra_data = {};
   export let show_check = true;
-
+  export let additional_fields = [];
   export let force_keypad = false;
 
   const defaultTheme = {
@@ -119,6 +119,21 @@
     );
   });
 
+  function validateAdditionalFields() {
+    let valid = true;
+    for (const field of additional_fields) {
+      if (field.required && (!extra_data[field.name] || extra_data[field.name].length === 0)) {
+        valid = false;
+        field.valid = false;
+      } else {
+        field.valid = true;
+      }
+    }
+    additional_fields = [...additional_fields];
+    return valid;
+  }
+
+  $: validation_disabled = !validate;
   $: valid_routing_number =
     !validate ||
     !validate_field("routing_number") ||
@@ -131,16 +146,22 @@
     !validate || !validate_field("account_holder") || account_holder;
   $: valid_account_type =
     !validate || !validate_field("account_type") || account_type;
+  $: additionalFieldsValid =
+    validation_disabled ||
+    additional_fields.length === 0 ||
+    validateAdditionalFields();
   $: allValid =
     valid_routing_number &&
     valid_account_number &&
     valid_account_holder &&
-    valid_account_type;
+    valid_account_type &&
+    additionalFieldsValid;
 
   let pci_address = testing ? pci_address_testing : pci_address_prod;
 
   async function submit() {
     validate = true;
+    validateAdditionalFields()
     await tick();
     if (!allValid) {
       return;
@@ -391,6 +412,33 @@
           bind:value={account_holder}
           disabled={isRetrieval}
         />
+      </div>
+    {/if}
+    {#if additional_fields.length}
+      <div id="pcivault-ach-form-additional-fields">
+        {#each additional_fields as field}
+          <div class="ach-input additional-field">
+            <label
+              for={field.name}
+              class="ach-input__label"
+            >
+              {$_(`form.${field.name}.label`, { default: field.label })}
+              {#if field.valid === false && field?.required}
+                <span class="ach-input__error">
+                  {$_(`form.${field.name}.required`, { default: "required" })}
+                </span>
+              {/if}
+            </label>
+            <input
+              type="text"
+              class="ach-input__input"
+              class:ach-input__invalid={field.valid === false && field?.required}
+              id={field.name}
+              on:input={() => validate && validateAdditionalFields()}
+              bind:value={extra_data[field.name]}
+            />
+          </div>
+        {/each}
       </div>
     {/if}
 

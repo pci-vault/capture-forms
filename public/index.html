@@ -44,8 +44,20 @@
       reference: "UNIQUEREF",
       hide_card: false,
       show_card: false, // deprecated, some people still use it
-      disable_luhn: true,
+      disable_luhn: false,
       force_keypad: false,
+      additional_fields: [
+        {
+          name: "zip_code",
+          label: "Zip Code",
+          required: true,
+        },
+        {
+          name: "telephone",
+          label: "Telephone",
+          required: true,
+        }
+      ],
       field_options: {
         reference: {
           visible: true,
@@ -96,6 +108,14 @@
             },
             "additional_data": {
               "label": "Допълнителни данни"
+            },
+            "zip_code": {
+              "label": "Пощенски код",
+              "required": "моля попълнете"
+            },
+            "telephone": {
+              "label": "Телефон",
+              "required": "моля попълнете"
             }
           }
         }
@@ -155,6 +175,17 @@
           alert("an error occurred")
       },
       extra_data: {"address": "42 Wallaby Way Sydney"},
+      additional_fields: [
+        {
+          name: "telephone",
+          label: "Telephone",
+          required: true,
+        },
+        {
+          name: "address",
+          label: "Address",
+        }
+      ],
       reference: "UNIQUEREF2",
       force_keypad: false,
       field_options: {},
