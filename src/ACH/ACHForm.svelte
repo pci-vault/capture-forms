@@ -321,9 +321,6 @@
         result = $_("retrieve.success", {
           default: "Account data successfully retrieved.",
         });
-        if (account_number?.length) {
-          isAccountRetrieved = true;
-        }
       })
       .catch(async function (r) {
         result = $_("retrieve.error", {
