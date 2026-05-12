@@ -122,6 +122,10 @@
   let isRetrieval;
   $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0;
 
+  $: if (isRetrieval) {
+    retrieve();
+  }
+
   onMount(function () {
     window.addEventListener("load", () =>
       document.getElementById("routing_number").focus()
