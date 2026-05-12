@@ -11,10 +11,13 @@
   export let pci_address_testing = "";
 
   export let testing = false;
+
   export let submit_url = "";
   export let submit_secret = "";
   export let retrieve_url = "";
   export let retrieve_secret = "";
+  export let token = "";
+
   export let success_callback = function () {};
   export let error_callback = function () {};
   export let extra_data = {};
@@ -177,6 +180,29 @@
 
   let pci_address = testing ? pci_address_testing : pci_address_prod;
 
+  function getField(object, possibleKeys, options) {
+    const {
+      convertToString = false,
+      deleteField = false,
+    } = options;
+
+    for (const key of possibleKeys) {
+      let value = object[key];
+
+      if (value && convertToString) {
+        value = value.toString();
+
+        if (value && value.length > 0) {
+          deleteField && delete object[key];
+          return value;
+        }
+      } else if (value) {
+        deleteField && delete object[key];
+        return value;
+      }
+    }
+  }
+
   async function submit() {
     validate = true;
     validateAdditionalFields()
@@ -292,7 +318,7 @@
         // ensure that the UI is updated before continuing
         await tick();
 
-        resultMessage = $_("retrieve.success", {
+        result = $_("retrieve.success", {
           default: "Account data successfully retrieved.",
         });
         if (account_number?.length) {
@@ -300,7 +326,7 @@
         }
       })
       .catch(async function (r) {
-        resultMessage = $_("retrieve.error", {
+        result = $_("retrieve.error", {
           default: "An error occurred, refresh the page and try again.",
         });
       });

@@ -226,8 +226,10 @@
 
     window.ach_form(document.getElementById("ach_app_retrieve"), {
       testing: true,
-      retrieve_secret: "your_secret_here",
-      retrieve_url: "/v1/retrieve/demo",
+      retrieve_secret: "xL9xFKO2Io8h3AbGsw7HWkKOnJWt4wEUcn137eis1MNhRkNXOTUN0kk-QDiiDAn8",
+      retrieve_url: "/v1/retrieve/test_retrieval_endpoint",
+      token: "db5acef062c915c8357d12cee5fca7e6ab78214edf6287adaae17954aab3b508",
+      reference: "test_proxy_get_xml",
       success_callback: (d) => {
           console.log(d);
           alert("success!")
@@ -236,10 +238,13 @@
           console.log(d);
           alert("an error occurred")
       },
-      extra_data: {"address": "42 Wallaby Way Sydney"},
-      reference: "UNIQUEREF2",
       force_keypad: false,
-      field_options: {},
+      field_options: {
+        reference: {
+          visible: true,
+          validate: true
+        },
+      },
       additional_fields: [
         {
           name: "telephone",
