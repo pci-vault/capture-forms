@@ -351,9 +351,10 @@
         }
       }
     }
+    const params = reference ? { reference: reference, form_type: "pcd" } : { form_type: "pcd" };
     axios({
       method: "post",
-      params: reference ? { reference: reference } : undefined,
+      params: params,
       url: url,
       data: submit_data,
       headers: {

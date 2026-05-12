@@ -57,6 +57,10 @@
       visible: field_options.account_type?.visible ?? true,
       validate: field_options.account_type?.validate ?? true,
     },
+    extra_data: {
+      visible: field_options.extra_data?.visible ?? true,
+      validate: false,
+    }
   };
 
   let languageOptions = [];
@@ -200,9 +204,11 @@
         delete submit_data[key];
       }
     }
+    const params = reference ? { reference: reference, form_type: "ach"} : { form_type: "ach" };
+
     axios({
       method: "post",
-      params: reference ? { reference: reference } : undefined,
+      params: params,
       url: url,
       data: submit_data,
       headers: {
@@ -231,6 +237,71 @@
         }
       });
   }
+
+  async function retrieve() {
+    await tick();
+
+    const retrieveUrlPattern = new RegExp('\\\/v1\\\/retrieve\\\/.+', '')
+
+    if (
+      !retrieve_url ||
+      !retrieve_secret ||
+      !token ||
+      !retrieveUrlPattern.test(retrieve_url)
+    ) {
+      throw new Error("Retrieve info not set correctly");
+    }
+
+    const url = pci_address + retrieve_url;
+    const params = { token: token };
+    if (reference) {
+      params["reference"] = reference;
+    }
+
+    axios({
+      method: "get",
+      params: params,
+      url: url,
+      headers: {
+        "X-PCIVault-Retrieve-Secret": retrieve_secret,
+      },
+    })
+      .then(async function (response) {
+        const data = { ...response.data };
+
+        const accountNumberAliases = ["account_number", "number", "account"];
+        account_number = getField(data, accountNumberAliases, {convertToString: true, deleteField: true});
+        delete data["last_four"];
+
+        const routingNumberAliases = ["routing_number", "branch_code", "branch_number"];
+        routing_number = getField(data, routingNumberAliases, {convertToString: true, deleteField: true});
+
+        account_holder = getField(data, ["account_holder"], {deleteField: true});
+
+        account_type = getField(data, ["account_type"], {deleteField: true});
+
+        // everything left over would have been extra_data
+        if (Object.keys(data).length > 0) {
+          extra_data = data;
+        }
+
+        // ensure that the UI is updated before continuing
+        await tick();
+
+        resultMessage = $_("retrieve.success", {
+          default: "Account data successfully retrieved.",
+        });
+        if (account_number?.length) {
+          isAccountRetrieved = true;
+        }
+      })
+      .catch(async function (r) {
+        resultMessage = $_("retrieve.error", {
+          default: "An error occurred, refresh the page and try again.",
+        });
+      });
+  }
+
 
   const setLanguage = (e) => {
     locale = e.target.value;
@@ -479,6 +550,18 @@
         {/each}
       </div>
     {/if}
+    {#if isRetrieval && field_settings.extra_data.visible && Object.keys(extra_data).length}
+      <div class="ach-form__row">
+        <span class="extra-data__label"
+          >{$_("form.additional_data.label", {
+            default: "Additional Data",
+          })}</span
+        >
+        <div class="extra-data">
+          <pre>{JSON.stringify(extra_data, null, 2)}</pre>
+        </div>
+      </div>
+    {/if}
 
     {#if !isRetrieval}
       <button
@@ -557,6 +640,27 @@
 
   .ach-form__row .ach-input {
     flex: 1 1 100px;
+  }
+  
+  .ach-form__row .extra-data {
+    padding: 10px;
+    color: #1a3b5d;
+    background-color: #eee;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .ach-form__row .extra-data pre {
+    overflow: scroll;
+  }
+
+  .extra-data__label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #1a3b5d;
+    width: 100%;
+    display: block;
   }
 
   .ach-form__button {
