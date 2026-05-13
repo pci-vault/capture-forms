@@ -129,6 +129,19 @@
     retrieve();
   }
 
+  // reset the form inputs to blanks
+  export let reset = () => {
+    if (!isRetrieval) {
+      validate = false;
+      account_number = "";
+      routing_number = "";
+      account_holder = "";
+      account_type = account_types[0];
+      extra_data = {};
+      reference = "";
+    }
+  };
+
   onMount(function () {
     window.addEventListener("load", () =>
       document.getElementById("routing_number").focus()
