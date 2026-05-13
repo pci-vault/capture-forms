@@ -147,6 +147,9 @@
   let isRetrieval;
   $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0;
 
+  $: asset_url = pci_address_prod + "/assets";
+  $: iconURL = cardType === "other" ? "" : `${asset_url}/card-icons/${cardType}.svg`;
+
   // deprecated: use hide_card instead
   $: show_card =
     (!isRetrieval && show_card) || (isRetrieval && isCardRetrieved);
@@ -623,6 +626,12 @@
           />
         {/if}
 
+        <div id="pcivault-pcd-card-logo" class="card-logo" class:card-logo-right={!isCardRetrieved}>
+          {#if iconURL}
+            <img src={iconURL} alt="">
+          {/if}
+        </div>
+
         {#if isCardRetrieved}
           <div class="actions">
             <span class="action" on:click={copyNumberToClipboard}>
@@ -1066,5 +1075,24 @@
     height: auto;
     padding: 5px 20px 5px 5px;
     margin: 0 15px;
+  }
+
+  .card-logo {
+    position: absolute;
+    padding-right: 45px;
+    right: 0;
+    top: 42%;
+    width: 99px;
+  }
+
+  .card-logo.card-logo-right {
+    padding-right: 10px;
+    width: 65px;
+  }
+
+  .card-logo img {
+    height: 100%;
+    width: 100%;
+    filter: invert(30%);
   }
 </style>
