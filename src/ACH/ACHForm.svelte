@@ -255,6 +255,8 @@
         }
       })
       .catch(async function (r) {
+        console.error(r);
+
         result = $_("form.ach_submit.error", {
           default: "An error occurred, refresh the page and try again.",
         });
@@ -323,6 +325,8 @@
         });
       })
       .catch(async function (r) {
+        console.error(r);
+
         result = $_("retrieve.error", {
           default: "An error occurred, refresh the page and try again.",
         });
@@ -352,7 +356,7 @@
 
 <div id="pcivault-ach-form" class="ach-form" style={cssVariables}>
   <div id="pcivault-ach-form-container" class="ach-form__inner">
-    {#if languageOptions.length && showLanguageSelector}
+    {#if languageOptions.length > 1 && showLanguageSelector}
       <div class="ach-input ach-input__language">
         <select
           name="language"

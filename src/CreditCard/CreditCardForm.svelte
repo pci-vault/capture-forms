@@ -372,6 +372,8 @@
         }
       })
       .catch(async function (r) {
+        console.error(r);
+
         resultMessage = $_("submit.error", {
           default: "An error occurred, refresh the page and try again.",
         });
@@ -460,6 +462,8 @@
         }
       })
       .catch(async function (r) {
+        console.error(r);
+
         resultMessage = $_("retrieve.error", {
           default: "An error occurred, refresh the page and try again.",
         });
@@ -494,7 +498,7 @@
 
 <div id="pcivault-pcd-form-container" class="card-form" style={cssVariables}>
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
-    {#if languageOptions.length && showLanguageSelector}
+    {#if languageOptions.length > 1 && showLanguageSelector}
       <div class="card-input card-input__language">
         <select
           name="language"
