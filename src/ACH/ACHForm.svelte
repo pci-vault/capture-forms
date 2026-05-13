@@ -1,3 +1,5 @@
+<svelte:options accessors />
+
 <!--suppress CssUnknownTarget -->
 <script>
   import { addMessages, init, _ } from "svelte-i18n";
