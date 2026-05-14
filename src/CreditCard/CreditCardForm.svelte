@@ -594,66 +594,69 @@
           {/if}
         </label>
 
-        {#if cardInputVisible}
-          <input
-            type="text"
-            id="cardNumber"
-            class="card-input__input"
-            class:card-input__invalid={!validNumber}
-            bind:value={cardNumber}
-            on:focus={() => (cardKeypad = force_keypad)}
-            on:keypress={(e) => {
-              cardKeypad && e.preventDefault();
-              return !cardKeypad;
-            }}
-            disabled={isRetrieval}
-            autocomplete="cc-number"
-          />
-        {:else}
-          <input
-            type="password"
-            id="cardNumberHidden"
-            class="card-input__input"
-            class:card-input__invalid={!validNumber}
-            bind:value={cardNumber}
-            on:focus={() => (cardKeypad = force_keypad)}
-            on:keypress={(e) => {
-              cardKeypad && e.preventDefault();
-              return !cardKeypad;
-            }}
-            disabled={isRetrieval}
-            autocomplete="cc-number"
-          />
-        {/if}
+        <div class="card-input__wrapper">
+          {#if cardInputVisible}
+            <input
+              type="text"
+              id="cardNumber"
+              class="card-input__input"
+              class:card-input__invalid={!validNumber}
+              bind:value={cardNumber}
+              on:focus={() => (cardKeypad = force_keypad)}
+              on:keypress={(e) => {
+                cardKeypad && e.preventDefault();
+                return !cardKeypad;
+              }}
+              disabled={isRetrieval}
+              autocomplete="cc-number"
+            />
+          {:else}
+            <input
+              type="password"
+              id="cardNumberHidden"
+              class="card-input__input"
+              class:card-input__invalid={!validNumber}
+              bind:value={cardNumber}
+              on:focus={() => (cardKeypad = force_keypad)}
+              on:keypress={(e) => {
+                cardKeypad && e.preventDefault();
+                return !cardKeypad;
+              }}
+              disabled={isRetrieval}
+              autocomplete="cc-number"
+            />
+          {/if}
 
-        <div id="pcivault-pcd-card-logo" class="card-logo" class:card-logo-right={!isCardRetrieved}>
-          {#if iconURL}
-            <img src={iconURL} alt="">
+          <div id="pcivault-pcd-card-logo" class="card-logo" class:card-logo-right={!isCardRetrieved}>
+            {#if iconURL}
+              <img src={iconURL} alt="">
+            {/if}
+          </div>
+
+          {#if isCardRetrieved}
+            <div class="actions">
+              <span class="action" on:click={copyNumberToClipboard}>
+                {#if isNumberCopiedToClipboard}
+                  <span title="Copied to Clipboard" class="action-success"
+                    ><IconClipboardCheck size={16} /></span
+                  >
+                {:else}
+                  <span title="Copy to Clipboard"
+                    ><IconClipboard size={16} /></span
+                  >
+                {/if}
+              </span>
+              <span
+                class="action"
+                on:click={() => (cardInputVisible = !cardInputVisible)}
+                title="Show Number"
+              >
+                <IconEye size={16} />
+              </span>
+            </div>
           {/if}
         </div>
 
-        {#if isCardRetrieved}
-          <div class="actions">
-            <span class="action" on:click={copyNumberToClipboard}>
-              {#if isNumberCopiedToClipboard}
-                <span title="Copied to Clipboard" class="action-success"
-                  ><IconClipboardCheck size={16} /></span
-                >
-              {:else}
-                <span title="Copy to Clipboard"
-                  ><IconClipboard size={16} /></span
-                >
-              {/if}
-            </span>
-            <span
-              class="action"
-              on:click={() => (cardInputVisible = !cardInputVisible)}
-              title="Show Number"
-            >
-              <IconEye size={16} />
-            </span>
-          </div>
-        {/if}
       </div>
     {/if}
     {#if fieldSettings.card_holder.visible}
@@ -754,45 +757,47 @@
             {/if}
           </label>
 
-          {#if cvvInputVisible}
-            <input
-              type="text"
-              class="card-input__input"
-              id="cardCvv"
-              maxlength="4"
-              class:card-input__invalid={!validCVV}
-              bind:value={cardCvv}
-              on:focus={() => (isCardFlipped = true)}
-              on:blur={() => (isCardFlipped = false)}
-              autocomplete="cc-csc"
-              disabled={isRetrieval}
-            />
-          {:else}
-            <input
-              type="password"
-              class="card-input__input"
-              id="cardCvv"
-              maxlength="4"
-              class:card-input__invalid={!validCVV}
-              bind:value={cardCvv}
-              on:focus={() => (isCardFlipped = true)}
-              on:blur={() => (isCardFlipped = false)}
-              autocomplete="cc-csc"
-              disabled={isRetrieval}
-            />
-          {/if}
+          <div class="card-input__wrapper">
+            {#if cvvInputVisible}
+              <input
+                type="text"
+                class="card-input__input"
+                id="cardCvv"
+                maxlength="4"
+                class:card-input__invalid={!validCVV}
+                bind:value={cardCvv}
+                on:focus={() => (isCardFlipped = true)}
+                on:blur={() => (isCardFlipped = false)}
+                autocomplete="cc-csc"
+                disabled={isRetrieval}
+              />
+            {:else}
+              <input
+                type="password"
+                class="card-input__input"
+                id="cardCvv"
+                maxlength="4"
+                class:card-input__invalid={!validCVV}
+                bind:value={cardCvv}
+                on:focus={() => (isCardFlipped = true)}
+                on:blur={() => (isCardFlipped = false)}
+                autocomplete="cc-csc"
+                disabled={isRetrieval}
+              />
+            {/if}
 
-          {#if isCVVRetrieved}
-            <div class="actions">
-              <span
-                class="action"
-                on:click={() => (cvvInputVisible = !cvvInputVisible)}
-                title="Show CVV"
-              >
-                <IconEye size={16} />
-              </span>
-            </div>
-          {/if}
+            {#if isCVVRetrieved}
+              <div class="actions">
+                <span
+                  class="action"
+                  on:click={() => (cvvInputVisible = !cvvInputVisible)}
+                  title="Show CVV"
+                >
+                  <IconEye size={16} />
+                </span>
+              </div>
+            {/if}
+          </div>
         </div>
       {/if}
     </div>
@@ -1050,7 +1055,7 @@
     color: #1a3b5d;
     position: absolute;
     right: 10px;
-    top: 40px;
+    top: 16px;
   }
 
   .card-input .actions .action-success {
@@ -1077,11 +1082,17 @@
     margin: 0 15px;
   }
 
+  .card-input__wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
   .card-logo {
     position: absolute;
     padding-right: 45px;
     right: 0;
-    top: 42%;
+    top: 17%;
     width: 99px;
   }
 
