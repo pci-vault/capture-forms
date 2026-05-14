@@ -125,6 +125,7 @@
   let account_number_keypad = false;
 
   let isRetrieval;
+  let isLoading = false;
   $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0;
 
   $: if (isRetrieval) {
@@ -251,6 +252,7 @@
     }
     const params = reference ? { reference: reference, form_type: "ach"} : { form_type: "ach" };
 
+    isLoading = true;
     axios({
       method: "post",
       params: params,
@@ -282,6 +284,9 @@
             submit_data
           );
         }
+      })
+      .finally(() => {
+        isLoading = false;
       });
   }
 
@@ -305,6 +310,7 @@
       params["reference"] = reference;
     }
 
+    isLoading = true;
     axios({
       method: "get",
       params: params,
@@ -345,6 +351,9 @@
         result = $_("retrieve.error", {
           default: "An error occurred, refresh the page and try again.",
         });
+      })
+      .finally(() => {
+        isLoading = false;
       });
   }
 
@@ -613,12 +622,13 @@
       <button
         id="pcivault-ach-form-button-submit"
         class="ach-form__button"
+        class:loading={isLoading}
         on:click={submit}
-        disabled={!allValid || result}
+        disabled={!allValid || result || isLoading}
         bind:clientWidth={submit_button_width}
         style="font-size:{submit_font_size}px;"
       >
-        {$_("form.ach_submit.label", { default: "SECURE CAPTURE ACCOUNT" })}
+        {$_("form.ach_submit.label", { default: "SECURE CAPTURE ACCOUNT" })}<span class="loader"></span>
       </button>
     {/if}
     {#if result}
@@ -727,6 +737,21 @@
   .ach-form__button:disabled {
     background: #a7a5a5;
     cursor: default;
+  }
+
+  .ach-form__button.loading .loader::after {
+    text-align: left;
+    display: inline-block;
+    width: 12px;
+    content: '';
+    animation: ellipsis 1.5s infinite;
+  }
+
+  @keyframes ellipsis {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    99% { content: '...'; }
   }
 
   .ach-input {
