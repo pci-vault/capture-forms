@@ -147,7 +147,7 @@
   let isRetrieval;
   $: isRetrieval = retrieve_url.length > 0 && submit_url.length === 0;
 
-  $: asset_url = pci_address_prod + "/assets";
+  $: asset_url = pci_address + "/assets";
   $: iconURL = cardType === "other" ? "" : `${asset_url}/card-icons/${cardType}.svg`;
 
   // deprecated: use hide_card instead
@@ -549,7 +549,7 @@
   {#if !hide_card && show_card}
     <div id="pcivault-pcd-form-card-container" style="padding-bottom: 32px">
       <CreditCard
-        asset_url={pci_address_prod + "/assets"}
+        asset_url={pci_address + "/assets"}
         {cardType}
         {cardNumberMask}
         {isCardFlipped}
