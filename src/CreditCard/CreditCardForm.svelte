@@ -1065,7 +1065,6 @@
   .card-input .actions .action {
     cursor: pointer;
     display: inline-block;
-    vertical-align: middle;
   }
 
   .card-input__language {
