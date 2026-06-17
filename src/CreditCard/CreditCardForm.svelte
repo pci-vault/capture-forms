@@ -139,6 +139,7 @@
   let isCardFlipped = false;
   let cardNumberMask;
   let resultMessage;
+  let resultSuccess = true;
   let cardKeypad = false;
 
   let isLoading = false;
@@ -368,10 +369,11 @@
       },
     })
       .then(async function (d) {
-        resultMessage = $_("submit.success", {
+        resultMessage = $_("form.submit.success", {
           default: "Card successfully captured.",
         });
         isCardSubmitted = true;
+        resultSuccess = true;
         await tick();
         if (typeof success_callback === "function") {
           success_callback(d.data, submit_data);
@@ -380,10 +382,11 @@
       .catch(async function (r) {
         console.error(r);
 
-        resultMessage = $_("submit.error", {
+        resultMessage = $_("form.submit.error", {
           default: "An error occurred, refresh the page and try again.",
         });
         isCardSubmitted = false;
+        resultSuccess = false;
         await tick();
         if (typeof error_callback === "function") {
           error_callback(
@@ -464,9 +467,10 @@
         // ensure that the UI is updated before continuing
         await tick();
 
-        resultMessage = $_("retrieve.success", {
+        resultMessage = $_("form.retrieve.success", {
           default: "Card data successfully retrieved.",
         });
+        resultSuccess = true;
         if (cardNumber?.length) {
           isCardRetrieved = true;
         }
@@ -474,9 +478,10 @@
       .catch(async function (r) {
         console.error(r);
 
-        resultMessage = $_("retrieve.error", {
+        resultMessage = $_("form.retrieve.error", {
           default: "An error occurred, refresh the page and try again.",
         });
+        resultSuccess = false;
       })
       .finally(() => {
         isLoading = false;
@@ -868,9 +873,7 @@
     {#if resultMessage}
       <div
         id="pcivault-pcd-form-submit-result"
-        class="card-input__result {resultMessage.includes('error')
-          ? 'card-input__error'
-          : 'card-input__success'}"
+        class="card-input__result {resultSuccess ? 'card-input__success' : 'card-input__error'}"
       >
         {resultMessage}
       </div>
