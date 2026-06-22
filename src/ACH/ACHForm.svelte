@@ -65,6 +65,9 @@
     extra_data: {
       visible: field_options.extra_data?.visible ?? true,
       validate: false,
+    },
+    submit: {
+      visible: field_options.submit?.visible ?? true,
     }
   };
 
@@ -219,7 +222,7 @@
     }
   }
 
-  async function submit() {
+  export let submit = async function() {
     validate = true;
     validateAdditionalFields()
     await tick();
@@ -618,7 +621,7 @@
       </div>
     {/if}
 
-    {#if !isRetrieval}
+    {#if !isRetrieval && field_settings.submit.visible}
       <button
         id="pcivault-ach-form-button-submit"
         class="ach-form__button"

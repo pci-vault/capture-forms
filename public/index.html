@@ -17,6 +17,15 @@
   <h2>Capture</h2>
   <div class="form-container">
     <div id="pcd_app"></div>
+    <p>
+      <button onclick="window.postMessage({type: 'submit'});">
+        Custom Submit
+      </button>
+      <button onclick="window.postMessage({type: 'reset'});">
+        Custom Reset
+      </button>
+  </p>
+
     <div id="pcd_app_update"></div>
     <div id="ach_app"></div>
   </div>
@@ -63,6 +72,9 @@
           visible: true,
           validate: true
         },
+        submit: {
+          visible: false
+        }
       },
       translations: {
         "bg": {

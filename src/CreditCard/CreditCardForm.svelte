@@ -78,6 +78,9 @@
     extra_data: {
       visible: field_options.extra_data?.visible ?? true,
       validate: false,
+    },
+    submit: {
+      visible: field_options.submit?.visible ?? true,
     }
   };
 
@@ -317,7 +320,7 @@
     }
   }
 
-  async function submit() {
+  export let submit = async function() {
     validate = true;
     validateAdditionalFields()
     await tick();
@@ -857,7 +860,7 @@
       </div>
     {/if}
 
-    {#if !isRetrieval}
+    {#if !isRetrieval && fieldSettings.submit.visible}
       <button
         id="pcivault-pcd-form-button-submit"
         class="card-form__button"
