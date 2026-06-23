@@ -123,7 +123,7 @@
   ];
   let account_type = account_types[0];
 
-  let result;
+  let resultMessage;
   let resultSuccess = true;
   let routing_number_keypad = false;
   let account_number_keypad = false;
