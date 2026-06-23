@@ -124,6 +124,7 @@
   let account_type = account_types[0];
 
   let result;
+  let resultSuccess = true;
   let routing_number_keypad = false;
   let account_number_keypad = false;
 
@@ -135,6 +136,8 @@
     retrieve();
   }
 
+  $: loadingStateChanged(isLoading);
+
   // reset the form inputs to blanks
   export let reset = () => {
     if (!isRetrieval) {
@@ -145,6 +148,14 @@
       account_type = account_types[0];
       extra_data = {};
       reference = "";
+
+      resultMessage = "";
+      resultSuccess = true;
+
+      for (const field of additional_fields) {
+        field.valid = true;
+      }
+      additional_fields = [...additional_fields]; // trigger reactivity
     }
   };
 
@@ -153,6 +164,20 @@
       document.getElementById("routing_number").focus()
     );
   });
+
+  function loadingStateChanged(loading) {
+    const parentWindow = window.parent;
+    if (parentWindow) {
+      parentWindow.postMessage({type: "state", name: "loading", value: loading}, "*");
+    }
+  }
+
+  function formValidationsStateChanged(valid) {
+    const parentWindow = window.parent;
+    if (parentWindow) {
+      parentWindow.postMessage({type: "state", name: "valid", value: valid}, "*");
+    }
+  }
 
   function validateAdditionalFields() {
     let valid = true;
@@ -196,6 +221,8 @@
     valid_account_type &&
     validReference &&
     additionalFieldsValid;
+
+  $: formValidationsStateChanged(allValid);
 
   let pci_address = testing ? pci_address_testing : pci_address_prod;
 
@@ -266,9 +293,10 @@
       },
     })
       .then(async function (d) {
-        result = $_("form.ach_submit.success", {
+        resultMessage = $_("form.ach_submit.success", {
           default: "Account successfully captured.",
         });
+        resultSuccess = true;
         await tick();
         if (typeof success_callback === "function") {
           success_callback(d.data, submit_data);
@@ -277,9 +305,10 @@
       .catch(async function (r) {
         console.error(r);
 
-        result = $_("form.ach_submit.error", {
+        resultMessage = $_("form.ach_submit.error", {
           default: "An error occurred, refresh the page and try again.",
         });
+        resultSuccess = false;
         await tick();
         if (typeof error_callback === "function") {
           error_callback(
@@ -344,16 +373,18 @@
         // ensure that the UI is updated before continuing
         await tick();
 
-        result = $_("retrieve.success", {
+        resultMessage = $_("retrieve.success", {
           default: "Account data successfully retrieved.",
         });
+        resultSuccess = true;
       })
       .catch(async function (r) {
         console.error(r);
 
-        result = $_("retrieve.error", {
+        resultMessage = $_("retrieve.error", {
           default: "An error occurred, refresh the page and try again.",
         });
+        resultSuccess = false;
       })
       .finally(() => {
         isLoading = false;
@@ -627,21 +658,19 @@
         class="ach-form__button"
         class:loading={isLoading}
         on:click={submit}
-        disabled={!allValid || result || isLoading}
+        disabled={!allValid || resultMessage || isLoading}
         bind:clientWidth={submit_button_width}
         style="font-size:{submit_font_size}px;"
       >
         {$_("form.ach_submit.label", { default: "SECURE CAPTURE ACCOUNT" })}<span class="loader"></span>
       </button>
     {/if}
-    {#if result}
+    {#if resultMessage}
       <div
         id="pcivault-ach-form-submit-result"
-        class="ach-input__result {result.includes('error')
-          ? 'ach-input__error'
-          : 'ach-input__success'}"
+        class="ach-input__result {resultSuccess ? 'ach-input__success' : 'ach-input__error'}"
       >
-        {result}
+        {resultMessage}
       </div>
     {/if}
   </div>

@@ -166,6 +166,8 @@
     retrieve();
   }
 
+  $: loadingStateChanged(isLoading);
+
   let cardInputVisible;
   let cvvInputVisible;
   $: cardInputVisible = !isRetrieval;
@@ -187,6 +189,13 @@
       isCardFlipped = false;
       isCardSubmitted = false;
       isLoading = false;
+      resultMessage = "";
+      resultSuccess = true;
+
+      for (const field of additional_fields) {
+        field.valid = true;
+      }
+      additional_fields = [...additional_fields]; // trigger reactivity
     }
   };
 
@@ -195,6 +204,20 @@
       document.getElementById("cardNumber").focus()
     );
   });
+
+  function loadingStateChanged(loading) {
+    const parentWindow = window.parent;
+    if (parentWindow) {
+      parentWindow.postMessage({type: "state", name: "loading", value: loading}, "*");
+    }
+  }
+
+  function formValidationsStateChanged(valid) {
+    const parentWindow = window.parent;
+    if (parentWindow) {
+      parentWindow.postMessage({type: "state", name: "valid", value: valid}, "*");
+    }
+  }
 
   function validateAdditionalFields() {
     let valid = true;
@@ -294,6 +317,8 @@
     validCVV &&
     validReference &&
     additionalFieldsValid;
+
+  $: formValidationsStateChanged(allValid);
 
   let pci_address = testing ? pci_address_testing : pci_address_prod;
 

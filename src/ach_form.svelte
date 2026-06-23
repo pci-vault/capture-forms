@@ -6,10 +6,12 @@
     export let onReset;
 
     window.addEventListener("message", (event) => {
-      if (event.data.type === "submit") {
+      if (event.data?.type === "action" && event.data?.name === "submit") {
         onSubmit();
-      } else if (event.data.type === "reset") {
+      } else if (event.data?.type === "action" && event.data?.name === "reset") {
         onReset();
+      } else {
+        console.log("Received unknown message", event.data);
       }
     });
 </script>
