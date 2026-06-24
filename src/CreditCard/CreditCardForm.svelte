@@ -78,9 +78,6 @@
     extra_data: {
       visible: field_options.extra_data?.visible ?? true,
       validate: false,
-    },
-    submit: {
-      visible: field_options.submit?.visible ?? true,
     }
   };
 
@@ -93,6 +90,7 @@
   export let translations = {};
   export let locale = "en";
   export let showLanguageSelector = true;
+  export let mode = "standalone";
 
   let includesFallbackLocale = false;
   for (const language of Object.keys(translations)) {
@@ -203,19 +201,39 @@
     window.addEventListener("load", () =>
       document.getElementById("cardNumber").focus()
     );
+
+    if (isEmbeddedForm()) {
+      window.addEventListener("message", (event) => {
+        if (event.data?.type === "action" && event.data?.name === "submit") {
+          onSubmit();
+        } else if (event.data?.type === "action" && event.data?.name === "reset") {
+          onReset();
+        } else {
+          console.log("Received unknown message", event.data);
+        }
+      });
+    }
   });
 
+  function isEmbeddedForm() {
+    return mode === "embedded";
+  }
+
   function loadingStateChanged(loading) {
-    const parentWindow = window.parent;
-    if (parentWindow) {
-      parentWindow.postMessage({type: "state", name: "loading", value: loading}, "*");
+    if (isEmbeddedForm()) {
+      const parentWindow = window.parent;
+      if (parentWindow) {
+        parentWindow.postMessage({type: "state", name: "loading", value: loading}, "*");
+      }
     }
   }
 
   function formValidationsStateChanged(valid) {
-    const parentWindow = window.parent;
-    if (parentWindow) {
-      parentWindow.postMessage({type: "state", name: "valid", value: valid}, "*");
+    if (isEmbeddedForm()) {
+      const parentWindow = window.parent;
+      if (parentWindow) {
+        parentWindow.postMessage({type: "state", name: "valid", value: valid}, "*");
+      }
     }
   }
 
@@ -885,7 +903,7 @@
       </div>
     {/if}
 
-    {#if !isRetrieval && fieldSettings.submit.visible}
+    {#if !isRetrieval && !isEmbeddedForm()}
       <button
         id="pcivault-pcd-form-button-submit"
         class="card-form__button"
