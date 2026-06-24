@@ -165,9 +165,9 @@
     if (settings.form_type == "embedded") {
       window.addEventListener("message", (event) => {
         if (event.data?.type === "action" && event.data?.name === "submit") {
-          onSubmit();
+          submit();
         } else if (event.data?.type === "action" && event.data?.name === "reset") {
-          onReset();
+          reset();
         } else {
           console.log("Received unknown message", event.data);
         }
