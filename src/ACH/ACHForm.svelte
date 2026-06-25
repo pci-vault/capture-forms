@@ -162,7 +162,7 @@
       document.getElementById("routing_number").focus()
     );
 
-    if (settings.form_type == "embedded") {
+    if (isEmbeddedForm()) {
       window.addEventListener("message", (event) => {
         if (event.data?.type === "action" && event.data?.name === "submit") {
           submit();
