@@ -90,6 +90,7 @@
   export let translations = {};
   export let locale = "en";
   export let showLanguageSelector = true;
+  export let mode = "standalone";
 
   let includesFallbackLocale = false;
   for (const language of Object.keys(translations)) {
@@ -163,6 +164,8 @@
     retrieve();
   }
 
+  $: loadingStateChanged(isLoading);
+
   let cardInputVisible;
   let cvvInputVisible;
   $: cardInputVisible = !isRetrieval;
@@ -184,6 +187,13 @@
       isCardFlipped = false;
       isCardSubmitted = false;
       isLoading = false;
+      resultMessage = "";
+      resultSuccess = true;
+
+      for (const field of additional_fields) {
+        field.valid = true;
+      }
+      additional_fields = [...additional_fields]; // trigger reactivity
     }
   };
 
@@ -191,7 +201,41 @@
     window.addEventListener("load", () =>
       document.getElementById("cardNumber").focus()
     );
+
+    if (isEmbeddedForm()) {
+      window.addEventListener("message", (event) => {
+        if (event.data?.type === "action" && event.data?.name === "submit") {
+          submit();
+        } else if (event.data?.type === "action" && event.data?.name === "reset") {
+          reset();
+        } else {
+          console.log("Received unknown message", event.data);
+        }
+      });
+    }
   });
+
+  function isEmbeddedForm() {
+    return mode === "embedded";
+  }
+
+  function loadingStateChanged(loading) {
+    if (isEmbeddedForm()) {
+      const parentWindow = window.parent;
+      if (parentWindow) {
+        parentWindow.postMessage({type: "state", name: "loading", value: loading}, "*");
+      }
+    }
+  }
+
+  function formValidationsStateChanged(valid) {
+    if (isEmbeddedForm()) {
+      const parentWindow = window.parent;
+      if (parentWindow) {
+        parentWindow.postMessage({type: "state", name: "valid", value: valid}, "*");
+      }
+    }
+  }
 
   function validateAdditionalFields() {
     let valid = true;
@@ -292,6 +336,8 @@
     validReference &&
     additionalFieldsValid;
 
+  $: formValidationsStateChanged(allValid);
+
   let pci_address = testing ? pci_address_testing : pci_address_prod;
 
   function getField(object, possibleKeys, options) {
@@ -317,7 +363,7 @@
     }
   }
 
-  async function submit() {
+  export let submit = async function() {
     validate = true;
     validateAdditionalFields()
     await tick();
@@ -857,7 +903,7 @@
       </div>
     {/if}
 
-    {#if !isRetrieval}
+    {#if !isRetrieval && !isEmbeddedForm()}
       <button
         id="pcivault-pcd-form-button-submit"
         class="card-form__button"

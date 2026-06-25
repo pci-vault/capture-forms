@@ -63,6 +63,9 @@
           visible: true,
           validate: true
         },
+        submit: {
+          visible: false
+        }
       },
       translations: {
         "bg": {
@@ -261,6 +264,49 @@
     })
   </script>
 
+  <h2>Hosted form</h2>
+
+  <script>
+    const triggerSubmit = () => {
+      const frame = document.getElementById("hosted-frame");
+      frame.contentWindow.postMessage({type: "action", name: "submit"}, "https://api-dev.pcivault.io")
+    };
+
+    const triggerReset = () => {
+      const frame = document.getElementById("hosted-frame");
+      frame.contentWindow.postMessage({type: "action", name: "reset"}, "https://api-dev.pcivault.io")
+    };
+
+    window.addEventListener("message", (event) => {
+      if (event.data?.type === "state" && event.data?.name === "loading") {
+        const isLoading = event.data.value || false;
+
+        console.log("Loading state changed. Setting disabled to ", isLoading);
+        if (isLoading) {
+          document.getElementById("external-submit").setAttribute("disabled", isLoading);
+          document.getElementById("external-reset").setAttribute("disabled", isLoading);
+        } else {
+          document.getElementById("external-submit").removeAttribute("disabled");
+          document.getElementById("external-reset").removeAttribute("disabled");
+        }
+
+      } else if (event.data?.type === "state" && event.data?.name === "valid") {
+        const isValid = event.data.value || false;
+        console.log("Valid state changed.", isValid);
+      }
+    })
+  </script>
+
+  <button id="external-submit" onclick="triggerSubmit()">External Submit</button>
+  <button id="external-reset" onclick="triggerReset()">External Reset</button>
+
+  <!-- Load custom frame configured with a hidden submit button -->
+  <iframe
+    id="hosted-frame"
+    src="https://api-dev.pcivault.io/v1/capture/iframe/2r9sftv9Qh6999wfosNCcW?unique_id=ySed5d5ZKSyX3ZS3dn7oRV&secret=secret"
+    width="500"
+    height="1000"
+  ></iframe>
 </body>
 
 <style>
