@@ -3,7 +3,7 @@
 <!--suppress CssUnknownTarget -->
 <script>
   import { addMessages, init, _ } from "svelte-i18n";
-  import { onMount, tick } from "svelte";
+  import { onMount, onDestroy, tick } from "svelte";
   import axios from "axios";
   import Keypad from "../lib/Keypad.svelte";
   import { LanguageOptions } from "../lib/translations";
@@ -157,23 +157,29 @@
     }
   };
 
-  onMount(function () {
-    window.addEventListener("load", () =>
-      document.getElementById("routing_number").focus()
-    );
-
+  onMount(() => {
+    window.addEventListener("load", focusOnFirstElement);
     if (isEmbeddedForm()) {
-      window.addEventListener("message", (event) => {
-        if (event.data?.type === "action" && event.data?.name === "submit") {
-          submit();
-        } else if (event.data?.type === "action" && event.data?.name === "reset") {
-          reset();
-        } else {
-          console.log("Received unknown message", event.data);
-        }
-      });
+      window.addEventListener("message", handleActionMessage)
     }
   });
+
+  onDestroy(() => {
+    window.removeEventListener("load", focusOnFirstElement);
+    window.removeEventListener("message", handleActionMessage);
+  });
+
+  function focusOnFirstElement() {
+    document.getElementById("routing_number").focus();
+  }
+
+  function handleActionMessage(event) {
+    if (event.data?.type === "action" && event.data?.name === "submit") {
+      submit();
+    } else if (event.data?.type === "action" && event.data?.name === "reset") {
+      reset();
+    }
+  }
 
   function isEmbeddedForm() {
     return mode === "embedded";

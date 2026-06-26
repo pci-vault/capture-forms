@@ -6,7 +6,7 @@
     Ported from https://svelte.dev/repl/153bbcac104f42569bcf82a1fb4ad94e?version=3.12.1
     */
   import { addMessages, init, _ } from "svelte-i18n";
-  import { onMount, tick } from "svelte";
+  import { onMount, onDestroy, tick } from "svelte";
   import axios from "axios";
   import luhn from "luhn-js";
   import {
@@ -197,23 +197,29 @@
     }
   };
 
-  onMount(function () {
-    window.addEventListener("load", () =>
-      document.getElementById("cardNumber").focus()
-    );
-
+  onMount(() => {
+    window.addEventListener("load", focusOnFirstElement);
     if (isEmbeddedForm()) {
-      window.addEventListener("message", (event) => {
-        if (event.data?.type === "action" && event.data?.name === "submit") {
-          submit();
-        } else if (event.data?.type === "action" && event.data?.name === "reset") {
-          reset();
-        } else {
-          console.log("Received unknown message", event.data);
-        }
-      });
+      window.addEventListener("message", handleActionMessage);
     }
   });
+
+  onDestroy(() => {
+    window.removeEventListener("load", focusOnFirstElement);
+    window.removeEventListener("message", handleActionMessage);
+  });
+
+  function focusOnFirstElement() {
+    document.getElementById("cardNumber").focus();
+  }
+
+  function handleActionMessage(event) {
+    if (event.data?.type === "action" && event.data?.name === "submit") {
+      submit();
+    } else if (event.data?.type === "action" && event.data?.name === "reset") {
+      reset();
+    }
+  }
 
   function isEmbeddedForm() {
     return mode === "embedded";
