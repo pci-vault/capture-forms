@@ -169,11 +169,11 @@
     window.removeEventListener("message", handleActionMessage);
   });
 
-  function focusOnFirstElement() {
+  const focusOnFirstElement = () => {
     document.getElementById("routing_number").focus();
   }
 
-  function handleActionMessage(event) {
+  const handleActionMessage = (event) => {
     if (event.data?.type === "action" && event.data?.name === "submit") {
       submit();
     } else if (event.data?.type === "action" && event.data?.name === "reset") {
