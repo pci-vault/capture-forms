@@ -36,6 +36,7 @@
   export let reference = null;
   export let show_card = true; // deprecated, use hide_card instead
   export let hide_card = false;
+  export let highlight_card_fields = false;
   export let disable_luhn = false;
   export let force_keypad = false;
   export let strip_spaces = false;
@@ -142,6 +143,11 @@
   let resultMessage;
   let resultSuccess = true;
   let cardKeypad = false;
+  let focusedField = null;
+
+  const unfocusField = (field) => {
+    if (focusedField === field) focusedField = null;
+  };
 
   let isLoading = false;
   let isCardSubmitted = false;
@@ -629,6 +635,11 @@
         logoImage={mergedTheme.logo_image}
         shadowColor={mergedTheme.card_shadow_color}
         primaryColor={mergedTheme.card_primary_color}
+        {highlight_card_fields}
+        card_number_selected={focusedField === "card_number"}
+        card_name_selected={focusedField === "card_name"}
+        card_expiry_selected={focusedField === "expiry"}
+        card_cvv_selected={focusedField === "cvv"}
       />
     </div>
   {/if}
@@ -669,7 +680,11 @@
               class="card-input__input"
               class:card-input__invalid={!validNumber}
               bind:value={cardNumber}
-              on:focus={() => (cardKeypad = force_keypad)}
+              on:focus={() => {
+                cardKeypad = force_keypad;
+                focusedField = "card_number";
+              }}
+              on:blur={() => unfocusField("card_number")}
               on:keypress={(e) => {
                 cardKeypad && e.preventDefault();
                 return !cardKeypad;
@@ -684,7 +699,11 @@
               class="card-input__input"
               class:card-input__invalid={!validNumber}
               bind:value={cardNumber}
-              on:focus={() => (cardKeypad = force_keypad)}
+              on:focus={() => {
+                cardKeypad = force_keypad;
+                focusedField = "card_number";
+              }}
+              on:blur={() => unfocusField("card_number")}
               on:keypress={(e) => {
                 cardKeypad && e.preventDefault();
                 return !cardKeypad;
@@ -748,6 +767,8 @@
           class="card-input__input"
           class:card-input__invalid={!validHolder}
           bind:value={cardName}
+          on:focus={() => (focusedField = "card_name")}
+          on:blur={() => unfocusField("card_name")}
           autocomplete="cc-name"
           disabled={isRetrieval}
         />
@@ -774,6 +795,8 @@
               id="cardMonth"
               class:card-input__invalid={!validMonth}
               bind:value={cardMonth}
+              on:focus={() => (focusedField = "expiry")}
+              on:blur={() => unfocusField("expiry")}
               disabled={isRetrieval}
             >
               <option value="" disabled selected
@@ -793,6 +816,8 @@
               id="cardYear"
               class:card-input__invalid={!validYear}
               bind:value={cardYear}
+              on:focus={() => (focusedField = "expiry")}
+              on:blur={() => unfocusField("expiry")}
               disabled={isRetrieval}
             >
               <option value="" disabled selected
@@ -833,8 +858,14 @@
                 maxlength="4"
                 class:card-input__invalid={!validCVV}
                 bind:value={cardCvv}
-                on:focus={() => (isCardFlipped = true)}
-                on:blur={() => (isCardFlipped = false)}
+                on:focus={() => {
+                  isCardFlipped = true;
+                  focusedField = "cvv";
+                }}
+                on:blur={() => {
+                  isCardFlipped = false;
+                  unfocusField("cvv");
+                }}
                 autocomplete="cc-csc"
                 disabled={isRetrieval}
               />
@@ -846,8 +877,14 @@
                 maxlength="4"
                 class:card-input__invalid={!validCVV}
                 bind:value={cardCvv}
-                on:focus={() => (isCardFlipped = true)}
-                on:blur={() => (isCardFlipped = false)}
+                on:focus={() => {
+                  isCardFlipped = true;
+                  focusedField = "cvv";
+                }}
+                on:blur={() => {
+                  isCardFlipped = false;
+                  unfocusField("cvv");
+                }}
                 autocomplete="cc-csc"
                 disabled={isRetrieval}
               />

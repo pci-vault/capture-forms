@@ -14,6 +14,12 @@
     export let cardCvv = ""
     export let hideCvv = false
 
+    export let highlight_card_fields = false
+    export let card_number_selected = false
+    export let card_name_selected = false
+    export let card_expiry_selected = false
+    export let card_cvv_selected = false
+
     let cardWidth = 100
 
     export let logoImage = "";
@@ -29,25 +35,27 @@
     $: fontSize = 0.05 * cardWidth;
     $: fontSizeSmall = 0.6 * fontSize;
     $: fontSizeBig = 1.4 * fontSize;
+    $: anySelected = highlight_card_fields && (card_number_selected || card_name_selected || card_expiry_selected || card_cvv_selected);
 </script>
 
 <div id="pcivault-pcd-card" class="card" bind:clientWidth={cardWidth} style="font-size:{fontSize}px;">
   <div id="pcivault-pcd-card-front" class="card-side front" class:flipped={isCardFlipped}>
-    <div id="pcivault-pcd-card-front-image-cover" class="card-img-cover">
+    <div id="pcivault-pcd-card-front-image-cover" class="card-img-cover" class:dimmed={anySelected}>
       <CardSVG id="pcivault-pcd-card-front-image" {primaryColor} {shadowColor} />
     </div>
     <div id="pcivault-pcd-card-front-grid" class="card-front-grid">
       <img id="pcivault-pcd-card-chip"
            alt="card chip"
            src={`${asset_url}/chip.svg`}
-           class="card-item-chip">
+           class="card-item-chip"
+           class:dimmed={anySelected}>
       {#if iconURL && !iconURL.includes("other")}
         {#each [iconURL] as iconURL (iconURL)}
           <img in:fly={{y:-20}} out:fly={{y:20}} id="pcivault-pcd-{cardType}-logo" src={iconURL} alt=""
-               class="card-item-logo">
+               class="card-item-logo" class:dimmed={anySelected}>
         {/each}
       {/if}
-      <div id="pcivault-pcd-card-number" class="card-number">
+      <div id="pcivault-pcd-card-number" class="card-number" class:spotlight={highlight_card_fields && card_number_selected} class:dimmed={anySelected && !card_number_selected}>
         {#each cardNumberMask as n, index (index)}
           {#if hideCardNumber && index >= (cardNumber.length - 4)}
             <span class="card-number-item">{cardNumber[index]}</span>
@@ -58,13 +66,13 @@
           {/if}
         {/each}
       </div>
-      <div id="pcivault-pcd-card-name" class="card-name">
+      <div id="pcivault-pcd-card-name" class="card-name" class:spotlight={highlight_card_fields && card_name_selected} class:dimmed={anySelected && !card_name_selected}>
         <div id="pcivault-pcd-card-name-label" style="font-size:{fontSizeSmall}px;">{$_('card.card_holder', {default: "Card Holder"})}</div>
         <div id="pcivault-pcd-card-name-value" style="font-size:{fontSize}px;">
           <span>{cardName || "FULL NAME"}</span>
         </div>
       </div>
-      <div id="pcivault-pcd-card-date" class="card-date">
+      <div id="pcivault-pcd-card-date" class="card-date" class:spotlight={highlight_card_fields && card_expiry_selected} class:dimmed={anySelected && !card_expiry_selected}>
         <div id="pcivault-pcd-card-date-label" style="font-size:{fontSizeSmall}px;">{$_('card.expiry', {default: "Expires"})}</div>
         <div id="pcivault-pcd-card-date-value" style="font-size:{fontSize}px;">
           <span>{expiry}</span>
@@ -73,15 +81,15 @@
     </div>
   </div>
   <div id="pcivault-pcd-card-back" class="card-side back" class:flipped={!isCardFlipped}>
-    <div id="pcivault-pcd-card-back-image-cover" class="card-img-cover">
+    <div id="pcivault-pcd-card-back-image-cover" class="card-img-cover" class:dimmed={anySelected}>
       <CardSVG id="pcivault-pcd-card-back-image" {primaryColor} {shadowColor} />
     </div>
     <div id="pcivault-pcd-card-back-box" class="card-back">
-      <div id="pcivault-pcd-card-mag-stripe" class="mag-stripe"></div>
+      <div id="pcivault-pcd-card-mag-stripe" class="mag-stripe" class:dimmed={anySelected}></div>
       <div id="pcivault-pcd-card-siganture-band" class="signature-band">
-        <div id="pcivault-pcd-card-siganture" class="signature-item" style="font-size:{fontSizeBig}px;">
+        <div id="pcivault-pcd-card-siganture" class="signature-item" style="font-size:{fontSizeBig}px;" class:dimmed={anySelected}>
           <span>{cardName}</span></div>
-        <div id="pcivault-pcd-card-cvv" class="cvv-item">
+        <div id="pcivault-pcd-card-cvv" class="cvv-item" class:spotlight={highlight_card_fields && card_cvv_selected} class:dimmed={anySelected && !card_cvv_selected}>
           {#if hideCvv}
             {#each cardCvv as cvvItem}*{/each}
           {:else}
@@ -89,7 +97,7 @@
           {/if}
         </div>
       </div>
-      <div id="pcivault-pcd-card-logo-back" class="card-logo-back">
+      <div id="pcivault-pcd-card-logo-back" class="card-logo-back" class:dimmed={anySelected}>
         <img src={iconURL} alt="">
       </div>
     </div>
@@ -294,5 +302,25 @@
         padding-right: 5%;
 
         height: 15%;
+    }
+
+    .spotlight {
+        position: relative;
+        z-index: 3;
+        border-radius: 4px;
+        padding: 4px 8px;
+        margin: -4px -8px;
+        text-shadow: none;
+    }
+
+    .card-number.spotlight,
+    .card-name.spotlight,
+    .card-date.spotlight {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dimmed {
+        filter: brightness(0.35);
+        transition: filter 0.2s ease-in-out;
     }
 </style>
