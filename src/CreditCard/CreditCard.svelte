@@ -133,7 +133,7 @@
         bottom: 0;
         right: 0;
         height: 100%;
-        box-shadow: 0 20px 60px 0 rgba(14, 42, 90, 0.55);
+        box-shadow: var(--card-box-shadow, rgba(14, 42, 90, 0.55) 0px 20px 60px 0px);
         border-radius: 16px;
         backface-visibility: hidden;
     }
