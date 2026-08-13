@@ -897,6 +897,7 @@
     height: auto;
     padding: 5px 20px 5px 5px;
     margin: 0 15px;
+    box-shadow: var(--input-wrapper-box-shadow);
   }
 
   :global(.ach-form--default) {
@@ -912,7 +913,7 @@
     --input-border-radius: 5px;
     --input-height: 50px;
     --input-font-size: 18px;
-    --input-font-family: "Source Sans Pro", sans-serif;
+    --input-font-family: "SFProDisplay", sans-serif;
     --input-wrapper-box-shadow: none;
 
     --label-font-size: 14px;
@@ -926,7 +927,7 @@
   }
 
   :global(.ach-form--modern) {
-    --form-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --form-font-family: -apple-system, "SFProDisplay", sans-serif;
     --form-background: white;
     --form-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     --form-border-radius: 6px;
@@ -938,7 +939,7 @@
     --input-border-radius: 5px;
     --input-height: 44px;
     --input-font-size: 16px;
-    --input-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --input-font-family: -apple-system, "SFProDisplay", sans-serif;
     --input-wrapper-box-shadow: rgba(0, 0, 0, 0.03) 0px 1px 1px 0px, rgba(0, 0, 0, 0.02) 0px 3px 6px 0px;
 
     --label-font-size: 13px;
