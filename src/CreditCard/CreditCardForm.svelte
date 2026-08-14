@@ -573,7 +573,7 @@
   `;
 </script>
 
-<div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'default'}" style={cssVariables}>
+<div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'pcivault'}" style={cssVariables}>
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
     {#if languageOptions.length > 1 && showLanguageSelector}
       <div class="card-input card-input__language">
@@ -1241,7 +1241,7 @@
     filter: invert(30%);
   }
 
-  :global(.card-form--default) {
+  :global(.card-form--pcivault) {
     --form-font-family: "SFProDisplay", sans-serif;
     --form-background: white;
     --form-box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
