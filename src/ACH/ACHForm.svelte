@@ -35,6 +35,7 @@
     card_shadow_color: "#069848",
     card_primary_color: "68B645",
     logo: "",
+    base_style: "",
   };
   const fallbackLocale = "en";
 
@@ -436,22 +437,24 @@
     `;
 </script>
 
-<div id="pcivault-ach-form" class="ach-form" style={cssVariables}>
+<div id="pcivault-ach-form" class="ach-form ach-form--{mergedTheme.base_style || 'pcivault'}" style={cssVariables}>
   <div id="pcivault-ach-form-container" class="ach-form__inner">
     {#if languageOptions.length > 1 && showLanguageSelector}
       <div class="ach-input ach-input__language">
-        <select
-          name="language"
-          class="ach-input__input select"
-          id="language-input"
-          on:change={setLanguage}
-        >
-          {#each languageOptions as option}
-            <option value={option.value} selected={option.value === locale}>
-              {option.label}
-            </option>
-          {/each}
-        </select>
+        <div class="ach-input__wrapper">
+          <select
+            name="language"
+            class="ach-input__input select"
+            id="language-input"
+            on:change={setLanguage}
+          >
+            {#each languageOptions as option}
+              <option value={option.value} selected={option.value === locale}>
+                {option.label}
+              </option>
+            {/each}
+          </select>
+        </div>
       </div>
     {/if}
     {#if field_settings.reference.visible}
@@ -470,15 +473,17 @@
             >
           {/if}
         </label>
-        <input
-          type="text"
-          class="ach-input__input"
-          id="reference"
-          class:ach-input__invalid={!validReference}
-          bind:value={reference}
-          autocomplete="ach-reference"
-          disabled={isRetrieval}
-        />
+        <div class="ach-input__wrapper">
+          <input
+            type="text"
+            class="ach-input__input"
+            id="reference"
+            class:ach-input__invalid={!validReference}
+            bind:value={reference}
+            autocomplete="ach-reference"
+            disabled={isRetrieval}
+          />
+        </div>
       </div>
     {/if}
     {#if field_settings.routing_number.visible}
@@ -509,19 +514,21 @@
             >
           {/if}
         </label>
-        <input
-          type="text"
-          id="routing_number"
-          class="ach-input__input"
-          class:ach-input__invalid={!valid_routing_number}
-          bind:value={routing_number}
-          on:focus={() => (routing_number_keypad = force_keypad)}
-          on:keypress={(e) => {
-            routing_number_keypad && e.preventDefault();
-            return !routing_number_keypad;
-          }}
-          disabled={isRetrieval}
-        />
+        <div class="ach-input__wrapper">
+          <input
+            type="text"
+            id="routing_number"
+            class="ach-input__input"
+            class:ach-input__invalid={!valid_routing_number}
+            bind:value={routing_number}
+            on:focus={() => (routing_number_keypad = force_keypad)}
+            on:keypress={(e) => {
+              routing_number_keypad && e.preventDefault();
+              return !routing_number_keypad;
+            }}
+            disabled={isRetrieval}
+          />
+        </div>
       </div>
     {/if}
     {#if field_settings.account_number.visible}
@@ -552,19 +559,21 @@
             >
           {/if}
         </label>
-        <input
-          type="text"
-          id="account_number"
-          class="ach-input__input"
-          class:ach-input__invalid={!valid_account_number}
-          bind:value={account_number}
-          on:focus={() => (account_number_keypad = force_keypad)}
-          on:keypress={(e) => {
-            account_number_keypad && e.preventDefault();
-            return !account_number_keypad;
-          }}
-          disabled={isRetrieval}
-        />
+        <div class="ach-input__wrapper">
+          <input
+            type="text"
+            id="account_number"
+            class="ach-input__input"
+            class:ach-input__invalid={!valid_account_number}
+            bind:value={account_number}
+            on:focus={() => (account_number_keypad = force_keypad)}
+            on:keypress={(e) => {
+              account_number_keypad && e.preventDefault();
+              return !account_number_keypad;
+            }}
+            disabled={isRetrieval}
+          />
+        </div>
       </div>
     {/if}
     {#if show_check}
@@ -595,17 +604,19 @@
             >
           {/if}
         </label>
-        <select
-          id="account_type"
-          class="ach-input__input"
-          class:ach-input__invalid={!valid_account_type}
-          bind:value={account_type}
-          disabled={isRetrieval}
-        >
-          {#each account_types as at, id}
-            <option value={at}>{at}</option>
-          {/each}
-        </select>
+        <div class="ach-input__wrapper">
+          <select
+            id="account_type"
+            class="ach-input__input"
+            class:ach-input__invalid={!valid_account_type}
+            bind:value={account_type}
+            disabled={isRetrieval}
+          >
+            {#each account_types as at, id}
+              <option value={at}>{at}</option>
+            {/each}
+          </select>
+        </div>
       </div>
     {/if}
     {#if field_settings.account_holder.visible}
@@ -626,14 +637,16 @@
             >
           {/if}
         </label>
-        <input
-          type="text"
-          id="account_holder"
-          class="ach-input__input"
-          class:ach-input__invalid={!valid_account_holder}
-          bind:value={account_holder}
-          disabled={isRetrieval}
-        />
+        <div class="ach-input__wrapper">
+          <input
+            type="text"
+            id="account_holder"
+            class="ach-input__input"
+            class:ach-input__invalid={!valid_account_holder}
+            bind:value={account_holder}
+            disabled={isRetrieval}
+          />
+        </div>
       </div>
     {/if}
     {#if additional_fields.length}
@@ -651,14 +664,16 @@
                 </span>
               {/if}
             </label>
-            <input
-              type="text"
-              class="ach-input__input"
-              class:ach-input__invalid={field.valid === false && field?.required}
-              id={field.name}
-              on:input={() => validate && validateAdditionalFields()}
-              bind:value={extra_data[field.name]}
-            />
+            <div class="ach-input__wrapper">
+              <input
+                type="text"
+                class="ach-input__input"
+                class:ach-input__invalid={field.valid === false && field?.required}
+                id={field.name}
+                on:input={() => validate && validateAdditionalFields()}
+                bind:value={extra_data[field.name]}
+              />
+            </div>
           </div>
         {/each}
       </div>
@@ -738,12 +753,12 @@
     margin: auto;
     width: 100%;
 
-    background: white;
-    box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
-    border-radius: 10px;
+    background: var(--form-background);
+    box-shadow: var(--form-box-shadow);
+    border-radius: var(--form-border-radius);
     padding: 16px 0 16px 0;
 
-    font-family: "SFProDisplay", sans-serif;
+    font-family: var(--form-font-family);
   }
 
   .ach-form__inner {
@@ -756,9 +771,9 @@
   
   .ach-form__row .extra-data {
     padding: 10px;
-    color: #1a3b5d;
+    color: var(--text-color);
     background-color: #eee;
-    border-radius: 5px;
+    border-radius: var(--input-border-radius);
     width: 100%;
   }
 
@@ -767,31 +782,31 @@
   }
 
   .extra-data__label {
-    font-size: 14px;
+    font-size: var(--label-font-size);
     margin-bottom: 5px;
     font-weight: 500;
-    color: #1a3b5d;
+    color: var(--text-color);
     width: 100%;
     display: block;
   }
 
   .ach-form__button {
     width: 100%;
-    height: 55px;
+    height: var(--button-height);
     background: var(--primary-color);
     border: none;
-    border-radius: 5px;
-    font-size: 22px;
+    border-radius: var(--button-border-radius);
+    font-size: var(--button-font-size);
     font-weight: 500;
 
-    box-shadow: 3px 10px 20px 0 rgba(35, 100, 210, 0.3);
-    color: #fff;
+    box-shadow: var(--button-box-shadow);
+    color: var(--button-color);
     margin-top: 10px;
     cursor: pointer;
   }
 
   .ach-form__button:disabled {
-    background: #a7a5a5;
+    background: var(--button-disabled-background);
     cursor: default;
   }
 
@@ -814,11 +829,15 @@
     margin-bottom: 16px;
   }
 
+  .ach-input__wrapper {
+    box-shadow: var(--input-wrapper-box-shadow);
+  }
+
   .ach-input__label {
-    font-size: 14px;
+    font-size: var(--label-font-size);
     margin-bottom: 5px;
     font-weight: 500;
-    color: #1a3b5d;
+    color: var(--text-color);
     width: 100%;
     display: block;
   }
@@ -826,25 +845,25 @@
   .ach-input__input {
     width: 100%;
     min-width: 7.5rem;
-    height: 50px;
-    border-radius: 5px;
+    height: var(--input-height);
+    border-radius: var(--input-border-radius);
     box-shadow: none;
-    border: 1px solid #ced6e0;
+    border: 1px solid var(--input-border-color);
     transition: all 0.3s ease-in-out;
-    font-size: 18px;
+    font-size: var(--input-font-size);
     padding: 5px 15px;
     background: none;
-    color: #1a3b5d;
-    font-family: "Source Sans Pro", sans-serif;
+    color: var(--text-color);
+    font-family: var(--input-font-family);
   }
 
   .ach-input__input:hover,
   .ach-input__input:focus {
-    border-color: #3d9cff;
+    border-color: var(--input-focus-border-color);
   }
 
   .ach-input__input:focus {
-    box-shadow: 0 10px 20px -13px rgba(32, 56, 117, 0.35);
+    box-shadow: var(--input-focus-box-shadow);
   }
 
   .ach-input__invalid {
@@ -878,5 +897,58 @@
     height: auto;
     padding: 5px 20px 5px 5px;
     margin: 0 15px;
+    box-shadow: var(--input-wrapper-box-shadow);
+  }
+
+  :global(.ach-form--pcivault) {
+    --form-font-family: "SFProDisplay", sans-serif;
+    --form-background: white;
+    --form-box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
+    --form-border-radius: 10px;
+
+    --text-color: #1a3b5d;
+    --input-border-color: #ced6e0;
+    --input-focus-border-color: #3d9cff;
+    --input-focus-box-shadow: 0 10px 20px -13px rgba(32, 56, 117, 0.35);
+    --input-border-radius: 5px;
+    --input-height: 50px;
+    --input-font-size: 18px;
+    --input-font-family: "SFProDisplay", sans-serif;
+    --input-wrapper-box-shadow: none;
+
+    --label-font-size: 14px;
+
+    --button-height: 55px;
+    --button-border-radius: 5px;
+    --button-font-size: 22px;
+    --button-box-shadow: 3px 10px 20px 0 rgba(35, 100, 210, 0.3);
+    --button-color: #fff;
+    --button-disabled-background: #a7a5a5;
+  }
+
+  :global(.ach-form--modern) {
+    --form-font-family: -apple-system, "SFProDisplay", sans-serif;
+    --form-background: white;
+    --form-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --form-border-radius: 6px;
+
+    --text-color: #30313d;
+    --input-border-color: #e0e0e0;
+    --input-focus-border-color: #0570de;
+    --input-focus-box-shadow: 0 0 0 3px rgba(5, 112, 222, 0.15);
+    --input-border-radius: 5px;
+    --input-height: 44px;
+    --input-font-size: 16px;
+    --input-font-family: -apple-system, "SFProDisplay", sans-serif;
+    --input-wrapper-box-shadow: rgba(0, 0, 0, 0.03) 0px 1px 1px 0px, rgba(0, 0, 0, 0.02) 0px 3px 6px 0px;
+
+    --label-font-size: 13px;
+
+    --button-height: 44px;
+    --button-border-radius: 4px;
+    --button-font-size: 16px;
+    --button-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 1px 0px, rgba(0, 0, 0, 0.1) 0px 3px 6px 0px;
+    --button-color: #fff;
+    --button-disabled-background: #cfd2d6;
   }
 </style>

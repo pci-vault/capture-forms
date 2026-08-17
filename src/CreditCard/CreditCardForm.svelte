@@ -49,6 +49,7 @@
     card_shadow_color: "#069848",
     card_primary_color: "#68B645",
     logo_image: "",
+    base_style: "",
   };
   const fallbackLocale = "en";
 
@@ -572,7 +573,7 @@
   `;
 </script>
 
-<div id="pcivault-pcd-form-container" class="card-form" style={cssVariables}>
+<div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'pcivault'}" style={cssVariables}>
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
     {#if languageOptions.length > 1 && showLanguageSelector}
       <div class="card-input card-input__language">
@@ -606,15 +607,17 @@
             >
           {/if}
         </label>
-        <input
-          type="text"
-          class="card-input__input"
-          id="reference"
-          class:card-input__invalid={!validReference}
-          bind:value={reference}
-          autocomplete="cc-reference"
-          disabled={isRetrieval}
-        />
+        <div class="card-input__wrapper">
+          <input
+            type="text"
+            class="card-input__input"
+            id="reference"
+            class:card-input__invalid={!validReference}
+            bind:value={reference}
+            autocomplete="cc-reference"
+            disabled={isRetrieval}
+          />
+        </div>
       </div>
     {/if}
   </div>
@@ -761,17 +764,19 @@
             >
           {/if}
         </label>
-        <input
-          type="text"
-          id="cardName"
-          class="card-input__input"
-          class:card-input__invalid={!validHolder}
-          bind:value={cardName}
-          on:focus={() => (focusedField = "card_name")}
-          on:blur={() => unfocusField("card_name")}
-          autocomplete="cc-name"
-          disabled={isRetrieval}
-        />
+        <div class="card-input__wrapper">
+          <input
+            type="text"
+            id="cardName"
+            class="card-input__input"
+            class:card-input__invalid={!validHolder}
+            bind:value={cardName}
+            on:focus={() => (focusedField = "card_name")}
+            on:blur={() => unfocusField("card_name")}
+            autocomplete="cc-name"
+            disabled={isRetrieval}
+          />
+        </div>
       </div>
     {/if}
     <div id="pcivault-pcd-form-expiry-cvv-row" class="card-form__row">
@@ -790,45 +795,49 @@
             {/if}
           </label>
           <div id="pcivault-pcd-form-date-input-group" class="card-form__group">
-            <select
-              class="card-input__input select"
-              id="cardMonth"
-              class:card-input__invalid={!validMonth}
-              bind:value={cardMonth}
-              on:focus={() => (focusedField = "expiry")}
-              on:blur={() => unfocusField("expiry")}
-              disabled={isRetrieval}
-            >
-              <option value="" disabled selected
-                >{$_("form.expiry_month.label", { default: "Month" })}</option
+            <div class="card-input__select-wrapper">
+              <select
+                class="card-input__input select"
+                id="cardMonth"
+                class:card-input__invalid={!validMonth}
+                bind:value={cardMonth}
+                on:focus={() => (focusedField = "expiry")}
+                on:blur={() => unfocusField("expiry")}
+                disabled={isRetrieval}
               >
-              {#each Array(12) as _, n}
-                <option
-                  value={n + 1 < 10 ? "0" + (n + 1) : "" + (n + 1)}
-                  disabled={n + 1 < parseInt(minCardMonth)}
+                <option value="" disabled selected
+                  >{$_("form.expiry_month.label", { default: "Month" })}</option
                 >
-                  {n + 1 < 10 ? "0" + (n + 1) : n + 1}
-                </option>
-              {/each}
-            </select>
-            <select
-              class="card-input__input select"
-              id="cardYear"
-              class:card-input__invalid={!validYear}
-              bind:value={cardYear}
-              on:focus={() => (focusedField = "expiry")}
-              on:blur={() => unfocusField("expiry")}
-              disabled={isRetrieval}
-            >
-              <option value="" disabled selected
-                >{$_("form.expiry_year.label", { default: "Year" })}</option
+                {#each Array(12) as _, n}
+                  <option
+                    value={n + 1 < 10 ? "0" + (n + 1) : "" + (n + 1)}
+                    disabled={n + 1 < parseInt(minCardMonth)}
+                  >
+                    {n + 1 < 10 ? "0" + (n + 1) : n + 1}
+                  </option>
+                {/each}
+              </select>
+            </div>
+            <div class="card-input__select-wrapper">
+              <select
+                class="card-input__input select"
+                id="cardYear"
+                class:card-input__invalid={!validYear}
+                bind:value={cardYear}
+                on:focus={() => (focusedField = "expiry")}
+                on:blur={() => unfocusField("expiry")}
+                disabled={isRetrieval}
               >
-              {#each Array(12) as _, n}
-                <option value={(n + parseInt(minCardYear)).toString(10)}>
-                  {(n + parseInt(minCardYear)).toString(10)}
-                </option>
-              {/each}
-            </select>
+                <option value="" disabled selected
+                  >{$_("form.expiry_year.label", { default: "Year" })}</option
+                >
+                {#each Array(12) as _, n}
+                  <option value={(n + parseInt(minCardYear)).toString(10)}>
+                    {(n + parseInt(minCardYear)).toString(10)}
+                  </option>
+                {/each}
+              </select>
+            </div>
           </div>
         </div>
       {/if}
@@ -920,15 +929,17 @@
                 </span>
               {/if}
             </label>
-            <input
-              type="text"
-              class="card-input__input"
-              class:card-input__invalid={field.valid === false && field?.required}
-              id={field.name}
-              on:input={() => validate && validateAdditionalFields()}
-              bind:value={extra_data[field.name]}
-              disabled={isRetrieval}
-            />
+            <div class="card-input__wrapper">
+              <input
+                type="text"
+                class="card-input__input"
+                class:card-input__invalid={field.valid === false && field?.required}
+                id={field.name}
+                on:input={() => validate && validateAdditionalFields()}
+                bind:value={extra_data[field.name]}
+                disabled={isRetrieval}
+              />
+            </div>
           </div>
         {/each}
       </div>
@@ -1008,12 +1019,12 @@
     margin: auto;
     width: 100%;
 
-    background: white;
-    box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
-    border-radius: 10px;
+    background: var(--form-background);
+    box-shadow: var(--form-box-shadow);
+    border-radius: var(--form-border-radius);
     padding: 16px 0 16px 0;
 
-    font-family: "SFProDisplay", sans-serif;
+    font-family: var(--form-font-family);
   }
 
   .card-form__inner {
@@ -1044,9 +1055,9 @@
 
   .card-form__row .extra-data {
     padding: 10px;
-    color: #1a3b5d;
+    color: var(--text-color);
     background-color: #eee;
-    border-radius: 5px;
+    border-radius: var(--input-border-radius);
     width: 100%;
   }
 
@@ -1055,31 +1066,31 @@
   }
 
   .extra-data__label {
-    font-size: 14px;
+    font-size: var(--label-font-size);
     margin-bottom: 5px;
     font-weight: 500;
-    color: #1a3b5d;
+    color: var(--text-color);
     width: 100%;
     display: block;
   }
 
   .card-form__button {
     width: 100%;
-    height: 55px;
+    height: var(--button-height);
     background: var(--primary-color);
     border: none;
-    border-radius: 5px;
-    font-size: 22px;
+    border-radius: var(--button-border-radius);
+    font-size: var(--button-font-size);
     font-weight: 500;
 
-    box-shadow: 3px 10px 20px 0 rgba(35, 100, 210, 0.3);
-    color: #fff;
+    box-shadow: var(--button-box-shadow);
+    color: var(--button-color);
     margin-top: 10px;
     cursor: pointer;
   }
 
   .card-form__button:disabled {
-    background: #a7a5a5;
+    background: var(--button-disabled-background);
     cursor: default;
   }
 
@@ -1109,10 +1120,10 @@
   }
 
   .card-input__label {
-    font-size: 14px;
+    font-size: var(--label-font-size);
     margin-bottom: 5px;
     font-weight: 500;
-    color: #1a3b5d;
+    color: var(--text-color);
     width: 100%;
     display: block;
   }
@@ -1120,25 +1131,25 @@
   .card-input__input {
     width: 100%;
     min-width: 7.5rem;
-    height: 50px;
-    border-radius: 5px;
+    height: var(--input-height);
+    border-radius: var(--input-border-radius);
     box-shadow: none;
-    border: 1px solid #ced6e0;
+    border: 1px solid var(--input-border-color);
     transition: all 0.3s ease-in-out;
-    font-size: 18px;
+    font-size: var(--input-font-size);
     padding: 5px 15px;
     background: none;
-    color: #1a3b5d;
-    font-family: "Source Sans Pro", sans-serif;
+    color: var(--text-color);
+    font-family: var(--input-font-family);
   }
 
   .card-input__input:hover,
   .card-input__input:focus {
-    border-color: #3d9cff;
+    border-color: var(--input-focus-border-color);
   }
 
   .card-input__input:focus {
-    box-shadow: 0 10px 20px -13px rgba(32, 56, 117, 0.35);
+    box-shadow: var(--input-focus-box-shadow);
   }
 
   .card-input__input.select {
@@ -1170,7 +1181,7 @@
   }
 
   .card-input .actions {
-    color: #1a3b5d;
+    color: var(--text-color);
     position: absolute;
     right: 10px;
     top: 16px;
@@ -1197,12 +1208,18 @@
     height: auto;
     padding: 5px 20px 5px 5px;
     margin: 0 15px;
+    box-shadow: var(--input-wrapper-box-shadow);
   }
 
   .card-input__wrapper {
     position: relative;
     display: inline-block;
     width: 100%;
+    box-shadow: var(--input-wrapper-box-shadow);
+  }
+
+  .card-input__select-wrapper {
+    box-shadow: var(--input-wrapper-box-shadow);
   }
 
   .card-logo {
@@ -1222,5 +1239,61 @@
     height: 100%;
     width: 100%;
     filter: invert(30%);
+  }
+
+  :global(.card-form--pcivault) {
+    --form-font-family: "SFProDisplay", sans-serif;
+    --form-background: white;
+    --form-box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
+    --form-border-radius: 10px;
+
+    --text-color: #1a3b5d;
+    --input-border-color: #ced6e0;
+    --input-focus-border-color: #3d9cff;
+    --input-focus-box-shadow: 0 10px 20px -13px rgba(32, 56, 117, 0.35);
+    --input-border-radius: 5px;
+    --input-height: 50px;
+    --input-font-size: 18px;
+    --input-font-family: "SFProDisplay", sans-serif;
+    --input-wrapper-box-shadow: none;
+
+    --label-font-size: 14px;
+
+    --button-height: 55px;
+    --button-border-radius: 5px;
+    --button-font-size: 22px;
+    --button-box-shadow: 3px 10px 20px 0 rgba(35, 100, 210, 0.3);
+    --button-color: #fff;
+    --button-disabled-background: #a7a5a5;
+
+    --card-box-shadow: rgba(14, 42, 90, 0.55) 0px 20px 60px 0px;
+  }
+
+  :global(.card-form--modern) {
+    --form-font-family: -apple-system, "SFProDisplay", sans-serif;
+    --form-background: white;
+    --form-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --form-border-radius: 6px;
+
+    --text-color: #30313d;
+    --input-border-color: #e0e0e0;
+    --input-focus-border-color: #0570de;
+    --input-focus-box-shadow: 0 0 0 3px rgba(5, 112, 222, 0.15);
+    --input-border-radius: 5px;
+    --input-height: 44px;
+    --input-font-size: 16px;
+    --input-font-family: -apple-system, "SFProDisplay", sans-serif;
+    --input-wrapper-box-shadow: rgba(0, 0, 0, 0.03) 0px 1px 1px 0px, rgba(0, 0, 0, 0.02) 0px 3px 6px 0px;
+
+    --label-font-size: 13px;
+
+    --button-height: 44px;
+    --button-border-radius: 4px;
+    --button-font-size: 16px;
+    --button-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 1px 0px, rgba(0, 0, 0, 0.1) 0px 3px 6px 0px;
+    --button-color: #fff;
+    --button-disabled-background: #cfd2d6;
+
+    --card-box-shadow: rgba(0, 0, 0, 0.3) 0px 20px 60px 0px;
   }
 </style>
