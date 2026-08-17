@@ -429,7 +429,11 @@
   let submit_font_size;
   $: submit_font_size = Math.round(0.05 * submit_button_width);
 
+  const validBaseStyles = ["pcivault", "modern"];
   const mergedTheme = { ...defaultTheme, ...theme };
+  if (!validBaseStyles.includes(mergedTheme.base_style)) {
+    mergedTheme.base_style = "";
+  }
   const cssVariables = `
       --primary-color: ${mergedTheme.primary_color};
       --success-color: ${mergedTheme.success_color};
