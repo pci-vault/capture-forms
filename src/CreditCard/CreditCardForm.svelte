@@ -1220,10 +1220,12 @@
     display: inline-block;
     width: 100%;
     box-shadow: var(--input-wrapper-box-shadow);
+    border-radius: var(--input-wrapper-border-radius);
   }
 
   .card-input__select-wrapper {
     box-shadow: var(--input-wrapper-box-shadow);
+    border-radius: var(--input-wrapper-border-radius);
   }
 
   .card-logo {
@@ -1256,6 +1258,7 @@
     --input-focus-border-color: #3d9cff;
     --input-focus-box-shadow: 0 10px 20px -13px rgba(32, 56, 117, 0.35);
     --input-border-radius: 5px;
+    --input-wrapper-border-radius: 0;
     --input-height: 50px;
     --input-font-size: 18px;
     --input-font-family: "SFProDisplay", sans-serif;
@@ -1284,6 +1287,7 @@
     --input-focus-border-color: #0570de;
     --input-focus-box-shadow: 0 0 0 3px rgba(5, 112, 222, 0.15);
     --input-border-radius: 5px;
+    --input-wrapper-border-radius: 5px;
     --input-height: 44px;
     --input-font-size: 16px;
     --input-font-family: -apple-system, "SFProDisplay", sans-serif;
