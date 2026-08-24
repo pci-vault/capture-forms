@@ -13,6 +13,8 @@
     IconClipboard,
     IconEye,
     IconClipboardCheck,
+    IconSun,
+    IconMoon,
   } from "@tabler/icons-svelte";
 
   import CreditCard from "./CreditCard.svelte";
@@ -41,6 +43,7 @@
   export let force_keypad = false;
   export let strip_spaces = false;
   export let additional_fields = [];
+  export let color_mode = "";
 
   const defaultTheme = {
     primary_color: "#009844",
@@ -575,9 +578,40 @@
     --success-color: ${mergedTheme.success_color};
     --error-color: ${mergedTheme.error_color};
   `;
+
+  const validColorModes = ["light", "dark", "auto"];
+  const isAutoColorMode = color_mode === "auto";
+  let resolvedColorMode = validColorModes.includes(color_mode) ? color_mode : "";
+  if (isAutoColorMode) {
+    resolvedColorMode =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+  }
+
+  const toggleColorMode = () => {
+    resolvedColorMode = resolvedColorMode === "dark" ? "light" : "dark";
+  };
 </script>
 
-<div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'pcivault'}" style={cssVariables}>
+<div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `card-form--${resolvedColorMode}` : ''}" style={cssVariables}>
+  {#if isAutoColorMode}
+    <button
+      id="pcivault-pcd-form-color-mode-toggle"
+      type="button"
+      class="card-form__color-mode-toggle"
+      on:click={toggleColorMode}
+      title={resolvedColorMode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      {#if resolvedColorMode === "dark"}
+        <IconSun size={18} />
+      {:else}
+        <IconMoon size={18} />
+      {/if}
+    </button>
+  {/if}
   <div id="pcivault-pcd-form-pre-card-container" class="card-form__inner">
     {#if languageOptions.length > 1 && showLanguageSelector}
       <div class="card-input card-input__language">
@@ -1019,6 +1053,7 @@
   }
 
   .card-form {
+    position: relative;
     max-width: 512px;
     margin: auto;
     width: 100%;
@@ -1029,6 +1064,24 @@
     padding: 16px 0 16px 0;
 
     font-family: var(--form-font-family);
+  }
+
+  .card-form__color-mode-toggle {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    z-index: 1;
   }
 
   .card-form__inner {
@@ -1158,11 +1211,16 @@
 
   .card-input__input.select {
     -webkit-appearance: none;
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAeCAYAAABuUU38AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUxJREFUeNrM1sEJwkAQBdCsngXPHsQO9O5FS7AAMVYgdqAd2IGCDWgFnryLFQiCZ8EGnJUNimiyM/tnk4HNEAg/8y6ZmMRVqz9eUJvRaSbvutCZ347bXVJy/ZnvTmdJ862Me+hAbZCTs6GHpyUi1tTSvPnqTpoWZPUa7W7ncT3vK4h4zVejy8QzM3WhVUO8ykI6jOxoGA4ig3BLHcNFSCGqGAkig2yqgpEiMsjSfY9LxYQg7L6r0X6wS29YJiYQYecemY+wHrXD1+bklGhpAhBDeu/JfIVGxaAQ9sb8CI+CQSJ+QmJg0Ii/EE2MBiIXooHRQhRCkBhNhBcEhLkwf05ZCG8ICCOpk0MULmvDSY2M8UawIRExLIQIEgHDRoghihgRIgiigBEjgiFATBACAgFgghEwSAAGgoBCBBgYAg5hYKAIFYgHBo6w9RRgAFfy160QuV8NAAAAAElFTkSuQmCC");
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%231a3b5d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M7 12l9 9 9-9'/%3E%3C/svg%3E");
     background-size: 12px;
-    background-position: 90% center;
+    background-position: right 15px center;
     background-repeat: no-repeat;
     padding-right: 30px;
+  }
+
+  :global(.card-form--dark) .card-input__input.select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23e4e6eb' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M7 12l9 9 9-9'/%3E%3C/svg%3E");
   }
 
   .card-input__invalid {
@@ -1213,6 +1271,7 @@
     padding: 5px 20px 5px 5px;
     margin: 0 15px;
     box-shadow: var(--input-wrapper-box-shadow);
+    background-position: right 5px center;
   }
 
   .card-input__wrapper {
@@ -1304,4 +1363,20 @@
 
     --card-box-shadow: rgba(0, 0, 0, 0.3) 0px 20px 60px 0px;
   }
+
+  :global(.card-form--dark) {
+    --form-background: #1e1e2d;
+
+    --text-color: #e4e6eb;
+    --input-border-color: #3a3a4c;
+    --input-focus-border-color: #3d9cff;
+
+    --button-color: #fff;
+    --button-disabled-background: #44475a;
+  }
+
+  :global(.card-form--dark) .card-form__row .extra-data {
+    background-color: #2a2a3c;
+  }
+
 </style>

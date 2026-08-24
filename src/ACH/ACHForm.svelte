@@ -5,6 +5,7 @@
   import { addMessages, init, _ } from "svelte-i18n";
   import { onMount, onDestroy, tick } from "svelte";
   import axios from "axios";
+  import { IconSun, IconMoon } from "@tabler/icons-svelte";
   import Keypad from "../lib/Keypad.svelte";
   import { LanguageOptions } from "../lib/translations";
   import Check from "./Check.svelte";
@@ -27,6 +28,7 @@
   export let additional_fields = [];
   export let force_keypad = false;
   export let reference = null;
+  export let color_mode = "";
 
   const defaultTheme = {
     primary_color: "#009844",
@@ -439,26 +441,55 @@
       --success-color: ${mergedTheme.success_color};
       --error-color: ${mergedTheme.error_color};
     `;
+
+  const validColorModes = ["light", "dark", "auto"];
+  const isAutoColorMode = color_mode === "auto";
+  let resolvedColorMode = validColorModes.includes(color_mode) ? color_mode : "";
+  if (isAutoColorMode) {
+    resolvedColorMode =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+  }
+
+  const toggleColorMode = () => {
+    resolvedColorMode = resolvedColorMode === "dark" ? "light" : "dark";
+  };
 </script>
 
-<div id="pcivault-ach-form" class="ach-form ach-form--{mergedTheme.base_style || 'pcivault'}" style={cssVariables}>
+<div id="pcivault-ach-form" class="ach-form ach-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `ach-form--${resolvedColorMode}` : ''}" style={cssVariables}>
+  {#if isAutoColorMode}
+    <button
+      id="pcivault-ach-form-color-mode-toggle"
+      type="button"
+      class="ach-form__color-mode-toggle"
+      on:click={toggleColorMode}
+      title={resolvedColorMode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      {#if resolvedColorMode === "dark"}
+        <IconSun size={18} />
+      {:else}
+        <IconMoon size={18} />
+      {/if}
+    </button>
+  {/if}
   <div id="pcivault-ach-form-container" class="ach-form__inner">
     {#if languageOptions.length > 1 && showLanguageSelector}
       <div class="ach-input ach-input__language">
-        <div class="ach-input__wrapper">
-          <select
-            name="language"
-            class="ach-input__input select"
-            id="language-input"
-            on:change={setLanguage}
-          >
-            {#each languageOptions as option}
-              <option value={option.value} selected={option.value === locale}>
-                {option.label}
-              </option>
-            {/each}
-          </select>
-        </div>
+        <select
+          name="language"
+          class="ach-input__input select"
+          id="language-input"
+          on:change={setLanguage}
+        >
+          {#each languageOptions as option}
+            <option value={option.value} selected={option.value === locale}>
+              {option.label}
+            </option>
+          {/each}
+        </select>
       </div>
     {/if}
     {#if field_settings.reference.visible}
@@ -611,7 +642,7 @@
         <div class="ach-input__wrapper">
           <select
             id="account_type"
-            class="ach-input__input"
+            class="ach-input__input select"
             class:ach-input__invalid={!valid_account_type}
             bind:value={account_type}
             disabled={isRetrieval}
@@ -753,6 +784,7 @@
   }
 
   .ach-form {
+    position: relative;
     max-width: 512px;
     margin: auto;
     width: 100%;
@@ -763,6 +795,24 @@
     padding: 16px 0 16px 0;
 
     font-family: var(--form-font-family);
+  }
+
+  .ach-form__color-mode-toggle {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    z-index: 1;
   }
 
   .ach-form__inner {
@@ -871,6 +921,20 @@
     box-shadow: var(--input-focus-box-shadow);
   }
 
+  .ach-input__input.select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%231a3b5d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M7 12l9 9 9-9'/%3E%3C/svg%3E");
+    background-size: 12px;
+    background-position: right 15px center;
+    background-repeat: no-repeat;
+    padding-right: 30px;
+  }
+
+  :global(.ach-form--dark) .ach-input__input.select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23e4e6eb' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M7 12l9 9 9-9'/%3E%3C/svg%3E");
+  }
+
   .ach-input__invalid {
     border-color: var(--error-color);
   }
@@ -903,6 +967,7 @@
     padding: 5px 20px 5px 5px;
     margin: 0 15px;
     box-shadow: var(--input-wrapper-box-shadow);
+    background-position: right 5px center;
   }
 
   :global(.ach-form--pcivault) {
@@ -957,5 +1022,20 @@
     --button-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 1px 0px, rgba(0, 0, 0, 0.1) 0px 3px 6px 0px;
     --button-color: #fff;
     --button-disabled-background: #cfd2d6;
+  }
+
+  :global(.ach-form--dark) {
+    --form-background: #1e1e2d;
+
+    --text-color: #e4e6eb;
+    --input-border-color: #3a3a4c;
+    --input-focus-border-color: #3d9cff;
+
+    --button-color: #fff;
+    --button-disabled-background: #44475a;
+  }
+
+  :global(.ach-form--dark) .ach-form__row .extra-data {
+    background-color: #2a2a3c;
   }
 </style>
