@@ -596,7 +596,7 @@
   };
 </script>
 
-<div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `card-form--${resolvedColorMode}` : ''}" style={cssVariables}>
+<div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `card-form--${resolvedColorMode}` : ''} {isAutoColorMode ? 'card-form--has-color-mode-toggle' : ''}" style={cssVariables}>
   {#if isAutoColorMode}
     <button
       id="pcivault-pcd-form-color-mode-toggle"
@@ -1064,6 +1064,10 @@
     padding: 16px 0 16px 0;
 
     font-family: var(--form-font-family);
+  }
+
+  .card-form--has-color-mode-toggle {
+    padding-top: 40px;
   }
 
   .card-form__color-mode-toggle {

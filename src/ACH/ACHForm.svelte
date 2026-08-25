@@ -459,7 +459,7 @@
   };
 </script>
 
-<div id="pcivault-ach-form" class="ach-form ach-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `ach-form--${resolvedColorMode}` : ''}" style={cssVariables}>
+<div id="pcivault-ach-form" class="ach-form ach-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `ach-form--${resolvedColorMode}` : ''} {isAutoColorMode ? 'ach-form--has-color-mode-toggle' : ''}" style={cssVariables}>
   {#if isAutoColorMode}
     <button
       id="pcivault-ach-form-color-mode-toggle"
@@ -795,6 +795,10 @@
     padding: 16px 0 16px 0;
 
     font-family: var(--form-font-family);
+  }
+
+  .ach-form--has-color-mode-toggle {
+    padding-top: 40px;
   }
 
   .ach-form__color-mode-toggle {
