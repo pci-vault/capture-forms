@@ -1030,6 +1030,7 @@
 
   :global(.ach-form--dark) {
     --form-background: #1e1e2d;
+    --form-box-shadow: none;
 
     --text-color: #e4e6eb;
     --input-border-color: #3a3a4c;
