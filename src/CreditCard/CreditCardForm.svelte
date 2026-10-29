@@ -141,9 +141,15 @@
 
   let amexCardMask = "#### ###### #####";
   let otherCardMask = "#### #### #### ####";
+  let longCardMask = "#### #### #### #### ###";
   let cardType;
   let isCardFlipped = false;
   let cardNumberMask;
+  // Only show the long mask on the card once the number goes past 16 digits
+  $: displayCardMask =
+    cardNumberMask === longCardMask && cardNumber.length <= otherCardMask.length
+      ? otherCardMask
+      : cardNumberMask;
   let resultMessage;
   let resultSuccess = true;
   let cardKeypad = false;
@@ -274,7 +280,11 @@
   $: {
     if (cardNumber.match(new RegExp("^3[47]\\d{0,13}")) != null)
       cardType = "amex";
-    else if (cardNumber.match(new RegExp("^5[1-5]")) != null)
+    else if (
+      cardNumber.match(
+        new RegExp("^(?:5[1-5]|222[1-9]|22[3-9]\\d|2[3-6]\\d{2}|27[01]\\d|2720)")
+      ) != null
+    )
       cardType = "mastercard";
     else if (
       cardNumber.match(
@@ -303,8 +313,9 @@
       cardType = "union";
     else cardType = "other"; // default type
 
-    cardNumberMask =
-      cardType === "amex" || cardType === "jcb1" ? amexCardMask : otherCardMask;
+    if (cardType === "amex" || cardType === "jcb1") cardNumberMask = amexCardMask;
+    else if (cardType === "mastercard") cardNumberMask = otherCardMask;
+    else cardNumberMask = longCardMask;
     cardType = cardType === "jcb1" ? "jcb" : cardType;
 
     // Credit card input masking
@@ -326,10 +337,24 @@
   }
 
   $: validation_disabled = disable_luhn || !validate;
+  // Valid card number lengths (digits only) per card type
+  const cardLengths = {
+    visa: [13, 16, 19],
+    amex: [15],
+    mastercard: [16],
+    discover: [16, 19],
+    diners: [14, 16, 19],
+    jcb: [15, 16, 19],
+    maestro: [12, 13, 14, 15, 16, 17, 18, 19],
+    union: [16, 17, 18, 19],
+    other: [12, 13, 14, 15, 16, 17, 18, 19],
+  };
+  $: cardDigits = cardNumber.replaceAll(" ", "");
   $: validNumber =
     validation_disabled ||
     !validate_field("card_number") ||
-    (cardNumber.length > 1 && luhn.isValid(cardNumber.replaceAll(" ", "")));
+    ((cardLengths[cardType] ?? cardLengths.other).includes(cardDigits.length) &&
+      luhn.isValid(cardDigits));
   $: validHolder =
     validation_disabled || !validate_field("card_holder") || cardName;
   $: validMonth = validation_disabled || !validate_field("expiry") || cardMonth;
@@ -665,7 +690,7 @@
       <CreditCard
         asset_url={pci_address + "/assets"}
         {cardType}
-        {cardNumberMask}
+        cardNumberMask={displayCardMask}
         {isCardFlipped}
         {cardNumber}
         hideCardNumber={isRetrieval && !cardInputVisible}
