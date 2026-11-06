@@ -145,11 +145,13 @@
   let cardType;
   let isCardFlipped = false;
   let cardNumberMask;
+
   // Only show the long mask on the card once the number goes past 16 digits
   $: displayCardMask =
     cardNumberMask === longCardMask && cardNumber.length <= otherCardMask.length
       ? otherCardMask
       : cardNumberMask;
+
   let resultMessage;
   let resultSuccess = true;
   let cardKeypad = false;
@@ -520,22 +522,22 @@
         const data = { ...response.data };
 
         const cardNumberAliases = ["card_number", "number", "n", "pan"];
-        cardNumber = getField(data, cardNumberAliases, {convertToString: true, deleteField: true});
+        cardNumber = getField(data, cardNumberAliases, {convertToString: true, deleteField: true}) ?? "";
         delete data["last_four"];
 
-        cardName = getField(data, ["card_holder"], {deleteField: true});
+        cardName = getField(data, ["card_holder"], {deleteField: true}) ?? "";
 
-        cardCvv = getField(data, ["cvv", "card_cvv"], {deleteField: true});
+        cardCvv = getField(data, ["cvv", "card_cvv"], {deleteField: true}) ?? "";
         if (cardCvv?.length) {
           isCVVRetrieved = true;
         }
 
-        cardYear = getField(data, ["expiry_year", "card_expiry_year"], {convertToString: true, deleteField: true});
+        cardYear = getField(data, ["expiry_year", "card_expiry_year"], {convertToString: true, deleteField: true}) ?? "";
         if (cardYear && cardYear.length == 2) {
           cardYear = "20" + cardYear;
         }
 
-        cardMonth = getField(data, ["expiry_month", "card_expiry_month"], {convertToString: true, deleteField: true});
+        cardMonth = getField(data, ["expiry_month", "card_expiry_month"], {convertToString: true, deleteField: true}) ?? "";
         if (cardMonth && cardMonth.length == 1) {
           cardMonth = "0" + cardMonth;
         }
