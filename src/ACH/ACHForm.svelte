@@ -142,6 +142,8 @@
   // reset the form inputs to blanks
   export let reset = () => {
     if (!isRetrieval) {
+      // native reset clears fields added by the host page and fires a "reset" event they can listen to
+      formElement?.reset();
       validate = false;
       account_number = "";
       routing_number = "";
@@ -276,11 +278,18 @@
     }
   }
 
+  let formElement;
+  // form controls that are part of the UI, not account data
+  const excludedFormFields = ["language"];
+
   export let submit = async function() {
     validate = true;
     validateAdditionalFields()
     await tick();
-    if (!allValid) {
+    // checkValidity() also covers named fields added by the host page
+    // (required/pattern/setCustomValidity); novalidate only suppresses browser UI
+    const formValid = formElement ? formElement.checkValidity() : true;
+    if (!allValid || !formValid) {
       return;
     }
 
@@ -292,6 +301,15 @@
       throw new Error("Submit info not set correctly");
     }
 
+    // collect any named fields in the form (e.g. inputs injected by the host page)
+    const form_data = {};
+    if (formElement) {
+      for (const [key, value] of new FormData(formElement)) {
+        if (excludedFormFields.includes(key)) continue;
+        form_data[key] = value;
+      }
+    }
+
     let url = pci_address + submit_url;
     let submit_data = {
       ...extra_data,
@@ -300,6 +318,8 @@
       account_type: account_type,
       account_holder: account_holder,
       last_four: account_number.slice(-4),
+      // form data takes precedence over the calculated fields
+      ...form_data,
     };
     // remove any empty fields
     for (const key in submit_data) {
@@ -460,6 +480,12 @@
 </script>
 
 <div id="pcivault-ach-form" class="ach-form ach-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `ach-form--${resolvedColorMode}` : ''} {isAutoColorMode ? 'ach-form--has-color-mode-toggle' : ''}" style={cssVariables}>
+<form
+  id="pcivault-ach-form-element"
+  bind:this={formElement}
+  on:submit|preventDefault={() => !isRetrieval && submit()}
+  novalidate
+>
   {#if isAutoColorMode}
     <button
       id="pcivault-ach-form-color-mode-toggle"
@@ -729,9 +755,9 @@
     {#if !isRetrieval && !isEmbeddedForm()}
       <button
         id="pcivault-ach-form-button-submit"
+        type="submit"
         class="ach-form__button"
         class:loading={isLoading}
-        on:click={submit}
         disabled={!allValid || resultMessage || isLoading}
         bind:clientWidth={submit_button_width}
         style="font-size:{submit_font_size}px;"
@@ -748,6 +774,7 @@
       </div>
     {/if}
   </div>
+</form>
 </div>
 
 <style>

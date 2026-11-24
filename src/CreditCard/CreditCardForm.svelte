@@ -192,6 +192,8 @@
   // reset the form inputs to blanks
   export let reset = () => {
     if (!isRetrieval) {
+      // native reset clears fields added by the host page and fires a "reset" event they can listen to
+      formElement?.reset();
       validate = false;
       cardName = "";
       cardNumber = "";
@@ -406,11 +408,18 @@
     }
   }
 
+  let formElement;
+  // form controls that are part of the UI, not card data
+  const excludedFormFields = ["language"];
+
   export let submit = async function() {
     validate = true;
     validateAdditionalFields()
     await tick();
-    if (!allValid) {
+    // checkValidity() also covers named fields added by the host page
+    // (required/pattern/setCustomValidity); novalidate only suppresses browser UI
+    const formValid = formElement ? formElement.checkValidity() : true;
+    if (!allValid || !formValid) {
       return;
     }
 
@@ -422,6 +431,15 @@
       !captureUrlPattern.test(submit_url)
     ) {
       throw new Error("Submit info not set correctly");
+    }
+
+    // collect any named fields in the form (e.g. inputs injected by the host page)
+    const form_data = {};
+    if (formElement) {
+      for (const [key, value] of new FormData(formElement)) {
+        if (excludedFormFields.includes(key)) continue;
+        form_data[key] = value;
+      }
     }
 
     let url = pci_address + submit_url;
@@ -436,6 +454,8 @@
       expiry_month: cardMonth,
       card_type: cardType,
       last_four: cardNumber.slice(-4),
+      // form data takes precedence over the calculated fields
+      ...form_data,
     };
     // remove any empty fields
     for (const key in submit_data) {
@@ -624,6 +644,12 @@
 </script>
 
 <div id="pcivault-pcd-form-container" class="card-form card-form--{mergedTheme.base_style || 'pcivault'} {resolvedColorMode ? `card-form--${resolvedColorMode}` : ''} {isAutoColorMode ? 'card-form--has-color-mode-toggle' : ''}" style={cssVariables}>
+<form
+  id="pcivault-pcd-form"
+  bind:this={formElement}
+  on:submit|preventDefault={() => !isRetrieval && submit()}
+  novalidate
+>
   {#if isAutoColorMode}
     <button
       id="pcivault-pcd-form-color-mode-toggle"
@@ -1025,9 +1051,9 @@
     {#if !isRetrieval && !isEmbeddedForm()}
       <button
         id="pcivault-pcd-form-button-submit"
+        type="submit"
         class="card-form__button"
         class:loading={isLoading}
-        on:click={submit}
         disabled={!allValid || isCardSubmitted || isLoading}
         bind:clientWidth={submit_button_width}
         style="font-size:{submit_font_size}px;"
@@ -1044,6 +1070,7 @@
       </div>
     {/if}
   </div>
+</form>
 </div>
 
 <style>

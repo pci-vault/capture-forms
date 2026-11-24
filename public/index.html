@@ -27,6 +27,159 @@
     <div id="ach_app_retrieve"></div>
   </div>
 
+  <script>
+    // Adds a free-text "expiry" (MM/YY) field after the CVV field of #pcd_app,
+    // replacing the built-in expiry selects, which are hidden here but kept in sync
+    // so the component's own expiry validation and card preview still work.
+    (function () {
+      const container = document.getElementById("pcd_app");
+
+      const formatExpiry = (value, isDeleting) => {
+        let digits = value.replace(/\D/g, "").slice(0, 4);
+        // a first digit above 1 can only be a single-digit month: pad it
+        if (digits.length >= 1 && digits[0] > "1") digits = "0" + digits.slice(0, 3);
+        // reject months 00 and 13-19
+        if (digits.length >= 2) {
+          const month = parseInt(digits.slice(0, 2), 10);
+          if (month < 1 || month > 12) digits = digits[0];
+        }
+        if (digits.length > 2) return digits.slice(0, 2) + "/" + digits.slice(2);
+        if (digits.length === 2 && !isDeleting) return digits + "/";
+        return digits;
+      };
+
+      const addExpiryField = (cvvField) => {
+        if (container.querySelector("#pcivault-pcd-form-custom-expiry-input")) return;
+
+        const cvvLabel = cvvField.querySelector("label");
+        const cvvWrapper = cvvField.querySelector(".card-input__wrapper");
+        const cvvInput = cvvField.querySelector("input");
+
+        // reuse the CVV elements' classes so Svelte's scoped styles apply
+        const field = document.createElement("div");
+        field.id = "pcivault-pcd-form-custom-expiry-input";
+        field.className = cvvField.className.replace(/\bcvv\b/, "").trim();
+
+        const label = document.createElement("label");
+        label.className = cvvLabel.className;
+        label.htmlFor = "cardExpiry";
+        label.textContent = "Expiry (MM/YY)";
+
+        const wrapper = document.createElement("div");
+        wrapper.className = cvvWrapper.className;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = "cardExpiry";
+        input.name = "expiry";
+        input.className = cvvInput.className.replace(/\bcard-input__invalid\b/, "").trim();
+        input.placeholder = "MM/YY";
+        input.maxLength = 5;
+        input.inputMode = "numeric";
+        input.autocomplete = "cc-exp";
+
+        input.required = true;
+        input.pattern = "(0[1-9]|1[0-2])/\\d{2}";
+
+        // error note in the label, matching the built-in fields
+        const error = document.createElement("span");
+        // the CVV error span only exists while invalid, so borrow Svelte's scope class from the label
+        const scopeClass = cvvLabel.className.match(/svelte-[\w-]+/)?.[0] || "";
+        error.className = `card-input__error ${scopeClass}`.trim();
+        error.style.display = "none";
+        label.append(" ", error);
+
+        const invalidClass = "card-input__invalid";
+        let showErrors = false; // only show errors after the first submit attempt
+
+        const updateCustomValidity = () => {
+          const match = input.value.match(/^(\d{2})\/(\d{2})$/);
+          let message = "";
+          if (match) {
+            const now = new Date();
+            const month = parseInt(match[1], 10);
+            const year = 2000 + parseInt(match[2], 10);
+            if (year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1)) {
+              message = "expired";
+            }
+          }
+          input.setCustomValidity(message);
+        };
+
+        const renderError = () => {
+          const valid = input.validity.valid;
+          input.classList.toggle(invalidClass, !valid);
+          error.style.display = valid ? "none" : "";
+          error.textContent = input.validity.valueMissing
+            ? "required"
+            : input.validity.customError ? "expired" : "invalid";
+        };
+
+        // fired by form.checkValidity() in the component's submit()
+        input.addEventListener("invalid", () => {
+          showErrors = true;
+          renderError();
+        });
+
+        // hide the original expiry selects; they stay in the DOM so we can drive them
+        const dateField = container.querySelector("#pcivault-pcd-form-date-input");
+        const monthSelect = container.querySelector("#cardMonth");
+        const yearSelect = container.querySelector("#cardYear");
+        if (dateField) dateField.style.display = "none";
+
+        // Svelte's bind:value on <select> listens for "change"
+        const setSelect = (select, value) => {
+          if (!select) return;
+          const hasOption = [...select.options].some((o) => o.value === value);
+          select.value = hasOption ? value : "";
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+        };
+
+        const syncSelects = () => {
+          const match = input.value.match(/^(\d{2})\/(\d{2})$/);
+          // year first: the component clears the month if it's before the current month this year
+          setSelect(yearSelect, match ? "20" + match[2] : "");
+          setSelect(monthSelect, match ? match[1] : "");
+        };
+
+        // the component's reset() calls form.reset(), which empties our input;
+        // also clear its validity and error state
+        // (input.form is null until the input is inserted, so use the CVV field's form)
+        cvvField.closest("form")?.addEventListener("reset", () => {
+          showErrors = false;
+          input.setCustomValidity("");
+          input.classList.remove(invalidClass);
+          error.style.display = "none";
+        });
+
+        input.addEventListener("input", (e) => {
+          const isDeleting = e.inputType?.startsWith("delete");
+          input.value = formatExpiry(input.value, isDeleting);
+          updateCustomValidity();
+          syncSelects();
+          if (showErrors) renderError();
+        });
+
+        wrapper.appendChild(input);
+        field.append(label, wrapper);
+        cvvField.after(field);
+      };
+
+      const tryAdd = () => {
+        const cvvField = container.querySelector("#pcivault-pcd-form-cvv-input");
+        if (cvvField) addExpiryField(cvvField);
+        return !!cvvField;
+      };
+
+      if (!tryAdd()) {
+        const observer = new MutationObserver(() => {
+          if (tryAdd()) observer.disconnect();
+        });
+        observer.observe(container, { childList: true, subtree: true });
+      }
+    })();
+  </script>
+
   <script defer>
     window.pcd_form(document.getElementById("pcd_app"), {
       testing: true,
